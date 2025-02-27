@@ -7,6 +7,7 @@
   <title>IC Hello Starter</title>
   <base href="/" />
   <link rel="icon" href="/favicon.ico" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' http://localhost:* https://icp0.io https://*.icp0.io https://icp-api.io https://openrouter.ai; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
 </head>
 
 <body>
@@ -15,7 +16,7 @@
     Firefox are recommended.
   </div>
   <div id="root"></div>
-  <script type="module" src="/src/main.jsx"></script>
+  <script type="module" src="src/main.jsx"></script>
 </body>
 
 </html>
