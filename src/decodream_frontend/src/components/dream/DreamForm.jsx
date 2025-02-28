@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAuth } from "../../context/AuthContext";
 import { useDreams } from "../../context/DreamContext";
@@ -20,12 +20,22 @@ const DreamForm = () => {
     setCurrentDream,
     setCurrentAnalysis,
     editingEntry,
+    setEditingEntry,
     error, 
     setError,
     addDreamEntry,
     updateDreamEntry,
-    resetCurrentDream
+    resetCurrentDream,
+    resetEditingState
   } = useDreams();
+
+  useEffect(() => {
+    if (editingEntry && currentDream) {
+      setDreamInput(currentDream);
+    } else {
+      setDreamInput('');
+    }
+  }, [editingEntry, currentDream]);
 
   const analyzeDream = async () => {
     if (!isLoggedIn && anonymousAnalysisDone) {
@@ -73,11 +83,12 @@ const DreamForm = () => {
         markAnonymousAnalysisDone();
       } else if (editingEntry) {
         await updateDreamEntry(dreamInput, analysisContent);
+        resetEditingState(); // Exit editing mode after update while preserving analysis
+        setDreamInput(""); // Clear the form after update while preserving analysis
       } else {
         await addDreamEntry(dreamInput, analysisContent);
+        setDreamInput(""); // Clear the form for new entries
       }
-
-      setDreamInput("");
     } catch (error) {
       setError("Failed to analyze the dream. Please try again.");
       console.error("Error:", error);

@@ -3,13 +3,10 @@ import Text "mo:base/Text";
 import Types "./types";
 
 actor Decodream {
-  // Stable storage for upgrade persistence
   stable var dreamEntries : [Types.DreamEntry] = [];
   
-  // Initialize the database
   private var db = DreamDatabase.DreamDatabase();
   
-  // Lifecycle hooks for canister upgrades
   system func preupgrade() {
     dreamEntries := db.getAllEntries();
   };
@@ -18,7 +15,6 @@ actor Decodream {
     db.populateFromEntries(dreamEntries);
   };
   
-  // Public API methods
   public func addDreamEntry(entry : Types.DreamEntry) : async () {
     db.addEntry(entry);
   };

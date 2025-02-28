@@ -16,6 +16,7 @@ export const DreamProvider = ({ children }) => {
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredEntries, setFilteredEntries] = useState([]);
+  const [dreamToDelete, setDreamToDelete] = useState(null);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -131,10 +132,19 @@ export const DreamProvider = ({ children }) => {
     setLastUpdated(null);
   };
 
+  const resetEditingState = () => {
+    setEditingEntry(null);
+  };
+
+  const clearDreamToDelete = () => {
+    setDreamToDelete(null);
+  };
+
   const value = {
     dreamEntries: filteredEntries,
     currentDream,
     setCurrentDream,
+    resetEditingState,
     currentAnalysis,
     setCurrentAnalysis,
     editingEntry,
@@ -151,6 +161,9 @@ export const DreamProvider = ({ children }) => {
     deleteDreamEntry,
     selectDreamForEditing,
     resetCurrentDream,
+    dreamToDelete,
+    setDreamToDelete,
+    clearDreamToDelete,
   };
 
   return <DreamContext.Provider value={value}>{children}</DreamContext.Provider>;

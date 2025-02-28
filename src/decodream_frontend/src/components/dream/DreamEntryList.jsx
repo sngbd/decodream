@@ -8,7 +8,7 @@ import "../styles/DreamEntryList.scss";
 
 const DreamEntryList = () => {
   const { isLoggedIn } = useAuth();
-  const { dreamEntries, loading, searchQuery } = useDreams();
+  const { dreamEntries, loading, searchQuery, dreamToDelete, setDreamToDelete, clearDreamToDelete, deleteDreamEntry } = useDreams();
 
   if (!isLoggedIn) {
     return null;
@@ -35,6 +35,7 @@ const DreamEntryList = () => {
           ))}
         </>
       )}
+      
     </div>
   );
 };

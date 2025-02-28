@@ -1,22 +1,15 @@
 import React, { useState } from "react";
 import Markdown from "react-markdown";
 import { useDreams } from "../../context/DreamContext";
-import ConfirmDialog from "../common/ConfirmDialog";
 import "../styles/DreamEntryItem.scss";
 
 const DreamEntryItem = ({ entry }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-  const { selectDreamForEditing, deleteDreamEntry } = useDreams();
+  const { selectDreamForEditing, deleteDreamEntry, setDreamToDelete } = useDreams();
 
   const handleEdit = () => {
     selectDreamForEditing(entry);
     window.scrollTo(0, 0);
-  };
-
-  const handleDelete = async () => {
-    await deleteDreamEntry(entry.timestamp);
-    setShowDeleteConfirm(false);
   };
 
   const formatDate = (timestamp) => {
@@ -44,7 +37,7 @@ const DreamEntryItem = ({ entry }) => {
             Edit
           </button>
           <button
-            onClick={() => setShowDeleteConfirm(true)}
+            onClick={() => setDreamToDelete(entry)}
             className="delete-button"
           >
             Delete
@@ -73,15 +66,6 @@ const DreamEntryItem = ({ entry }) => {
           </div>
         )}
       </details>
-
-      {showDeleteConfirm && (
-        <ConfirmDialog
-          title="Delete Dream Entry"
-          message="Are you sure you want to delete this dream entry? This action cannot be undone."
-          onConfirm={handleDelete}
-          onCancel={() => setShowDeleteConfirm(false)}
-        />
-      )}
     </div>
   );
 };
