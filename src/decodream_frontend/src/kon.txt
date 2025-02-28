@@ -1,0 +1,357 @@
+Bikin desainnya bagus dan rapih pakai bootstrap
+
+LandingPage.jsx
+// components/landing/LandingPage.js
+import React from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+
+const LandingPage = () => {
+  const { isAuthenticated } = useAuth();
+
+  return (
+    <div className="landing-page">
+      <div className="hero-section">
+        <h1>Dream Analyzer</h1>
+        <p className="subtitle">Unlock the mysteries of your subconscious mind</p>
+
+        <div className="hero-cta">
+          {isAuthenticated ? (
+            <Link to="/dreams" className="cta-button primary">
+              Go to My Dreams
+            </Link>
+          ) : (
+            <>
+              <Link to="/login" className="cta-button primary">
+                Login
+              </Link>
+              <Link to="/register" className="cta-button secondary">
+                Sign Up
+              </Link>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="features-section">
+        <h2>Explore Your Dreams</h2>
+        <div className="features-grid">
+          <div className="feature-card">
+            <h3>Record Dreams</h3>
+            <p>Quickly document your dreams before they fade from memory</p>
+          </div>
+          <div className="feature-card">
+            <h3>Analyze Patterns</h3>
+            <p>Discover recurring themes and symbols in your dream journal</p>
+          </div>
+          <div className="feature-card">
+            <h3>AI Insights</h3>
+            <p>Get personalized interpretations of your dreams</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default LandingPage;
+
+Variable.scss 
+
+$dream-primary: #8a2be2;
+$dream-secondary: #4b0082;
+$dream-accent: #da70d6;
+$dream-background: #0f0524;
+$dream-text-primary: #e6e6fa;
+$dream-text-secondary: #b19cd9;
+$dream-highlight: #ff00ff;
+$dream-shadow: rgba(138, 43, 226, 0.5);
+$dream-panel: rgba(20, 10, 45, 0.8);
+$dream-panel-border: rgba(218, 112, 214, 0.5);
+$dream-danger: #ff355e;
+$dream-success: #00ffbf;
+
+$font-primary: 'Orbitron', sans-serif;
+$font-secondary: 'Rajdhani', sans-serif;
+$font-body: 'Quicksand', sans-serif;
+
+$text-glow: 0 0 5px rgba(138, 43, 226, 0.7), 0 0 10px rgba(138, 43, 226, 0.5);
+$button-glow: 0 0 10px rgba(218, 112, 214, 0.7), 0 0 20px rgba(138, 43, 226, 0.5);
+$panel-glow: 0 0 15px rgba(138, 43, 226, 0.3);
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 10px rgba(138, 43, 226, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(218, 112, 214, 0.7); }
+  100% { box-shadow: 0 0 10px rgba(138, 43, 226, 0.5); }
+}
+
+@keyframes text-shimmer {
+  0% { color: $dream-text-primary; text-shadow: $text-glow; }
+  50% { color: $dream-accent; text-shadow: 0 0 8px rgba(218, 112, 214, 0.9); }
+  100% { color: $dream-text-primary; text-shadow: $text-glow; }
+}
+
+@mixin dream-panel {
+  background: $dream-panel;
+  border: 1px solid $dream-panel-border;
+  box-shadow: $panel-glow;
+  border-radius: 8px;
+  backdrop-filter: blur(5px);
+}
+
+@mixin dream-button {
+  background: linear-gradient(135deg, $dream-secondary, $dream-primary);
+  color: $dream-text-primary;
+  border: 1px solid $dream-accent;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-family: $font-primary;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: $button-glow;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background: linear-gradient(135deg, $dream-primary, $dream-accent);
+    box-shadow: 0 0 15px rgba(218, 112, 214, 0.9);
+    transform: translateY(-2px);
+  }
+
+  &:disabled {
+    background: linear-gradient(135deg, desaturate($dream-secondary, 40%), desaturate($dream-primary, 40%));
+    border-color: desaturate($dream-accent, 40%);
+    opacity: 0.7;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+@mixin scrollbar {
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $dream-background;
+    border-radius: 8px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $dream-primary;
+    border-radius: 8px;
+    border: 2px solid $dream-background;
+
+    &:hover {
+      background: $dream-accent;
+    }
+  }
+}
+
+Main.scss 
+
+@import 'variables';
+
+body {
+  background: $dream-background;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.3) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(218, 112, 214, 0.2) 0%, transparent 40%);
+  color: $dream-text-primary;
+  font-family: $font-body;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  @include scrollbar;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-primary;
+  margin-top: 0;
+  color: $dream-accent;
+  text-shadow: $text-glow;
+}
+
+h1 {
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+
+h2 {
+  font-weight: 600;
+  letter-spacing: 1.5px;
+}
+
+img {
+  max-width: 50vw;
+  max-height: 25vw;
+  display: block;
+  margin: auto;
+}
+
+form {
+  display: flex;
+  justify-content: center;
+  gap: 0.5em;
+  flex-flow: row wrap;
+  max-width: 40vw;
+  margin: auto;
+  align-items: baseline;
+}
+
+a {
+  color: $dream-accent;
+  text-decoration: none;
+  transition: color 0.2s;
+
+  &:hover {
+    color: $dream-highlight;
+    text-shadow: 0 0 8px rgba(255, 0, 255, 0.6);
+  }
+}
+
+button {
+  @include dream-button;
+}
+
+input, textarea {
+  background: rgba(15, 5, 36, 0.6);
+  border: 1px solid $dream-panel-border;
+  border-radius: 4px;
+  color: $dream-text-primary;
+  padding: 10px 10px;
+  font-family: $font-secondary;
+  transition: all 0.2s;
+
+  &:focus {
+    outline: none;
+    border-color: $dream-accent;
+    box-shadow: 0 0 8px rgba(218, 112, 214, 0.5);
+  }
+
+  &::placeholder {
+    color: $dream-text-secondary;
+    opacity: 0.7;
+  }
+}
+
+.app-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid $dream-panel-border;
+  margin-bottom: 30px;
+
+  h1 {
+    margin: 0;
+    animation: text-shimmer 5s infinite alternate;
+  }
+
+  p {
+    margin: 5px 0 0 0;
+    color: $dream-text-secondary;
+    font-family: $font-secondary;
+  }
+}
+
+footer {
+  margin-top: 60px;
+  text-align: center;
+  padding: 20px;
+  border-top: 1px solid $dream-panel-border;
+  color: $dream-text-secondary;
+  font-family: $font-secondary;
+  font-size: 0.9em;
+
+  p {
+    margin: 5px 0;
+  }
+}
+
+.browser-warning {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+
+div:first-child {
+      margin-bottom: 15px;
+    }
+  }
+}
+
+Main.jsx
+// Update main.js to include router
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+import './main.scss';
+import { InternetIdentityProvider } from "ic-use-internet-identity";
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <InternetIdentityProvider>
+      <App />
+    </InternetIdentityProvider>
+  </React.StrictMode>,
+);
+
+App.jsx
+// App.js
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import { DreamProvider } from "./context/DreamContext";
+import Layout from "./components/layout/Layout";
+import DreamForm from "./components/dream/DreamForm";
+import DreamAnalysis from "./components/dream/DreamAnalysis";
+import DreamEntryList from "./components/dream/DreamEntryList";
+import LandingPage from "./components/landing/LandingPage";
+import Login from "./components/auth/Login";
+import Register from "./components/auth/Register";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+
+const App = () => {
+  return (
+    <Router>
+      <AuthProvider>
+        <DreamProvider>
+          <Layout>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route 
+                path="/dreams" 
+                element={
+                  <ProtectedRoute>
+                    <div className="dream-container">
+                      <DreamForm />
+                      <DreamAnalysis />
+                      <DreamEntryList />
+                    </div>
+                  </ProtectedRoute>
+                } 
+              />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Layout>
+        </DreamProvider>
+      </AuthProvider>
+    </Router>
+  );
+};
+
+export default App;

@@ -20,7 +20,6 @@ const DreamForm = () => {
     setCurrentDream,
     setCurrentAnalysis,
     editingEntry,
-    setEditingEntry,
     error, 
     setError,
     addDreamEntry,
@@ -43,7 +42,7 @@ const DreamForm = () => {
       return;
     }
 
-    if (!dreamInput) {
+    if (!dreamInput.trim()) {
       setError("Please enter a dream.");
       return;
     }
@@ -91,52 +90,76 @@ const DreamForm = () => {
       }
     } catch (error) {
       setError("Failed to analyze the dream. Please try again.");
-      console.error("Error:", error);
+      console.error("Error analyzing dream:", error);
     } finally {
       setIsAnalyzing(false);
     }
   };
 
+  const handleKeyDown = (e) => {
+    // Allow submitting with Ctrl+Enter or Cmd+Enter
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      analyzeDream();
+    }
+  };
+
   return (
-    <div className="dream-form-container">
+    <section className="dream-form-container" aria-labelledby="dream-form-title">
       <div className="form-header">
-        <h2>{editingEntry ? "Edit Dream" : "New Dream"}</h2>
+        <h2 id="dream-form-title">{editingEntry ? "Edit Dream" : "New Dream"}</h2>
       </div>
       
+      <label htmlFor="dream-textarea" className="sr-only">
+        Describe your dream
+      </label>
       <textarea
+        id="dream-textarea"
         placeholder="Describe your dream..."
         value={dreamInput}
         onChange={(e) => setDreamInput(e.target.value)}
+        onKeyDown={handleKeyDown}
         className="dream-textarea"
+        aria-invalid={error ? "true" : "false"}
+        aria-describedby={error ? "dream-error" : undefined}
+        disabled={isAnalyzing}
+        rows="6"
       />
       
       <div className="button-group">
         <button
+          type="button"
           onClick={analyzeDream}
-          disabled={isAnalyzing || (!isLoggedIn && anonymousAnalysisDone)}
+          disabled={isAnalyzing || (!isLoggedIn && anonymousAnalysisDone) || !dreamInput.trim()}
           className="analyze-button"
+          aria-busy={isAnalyzing}
         >
           {isAnalyzing ? "Analyzing..." : editingEntry ? "Update & Analyze" : "Analyze Dream"}
         </button>
         
         {editingEntry && (
           <button
+            type="button"
             onClick={resetCurrentDream}
             className="cancel-button"
+            disabled={isAnalyzing}
           >
             Cancel Edit
           </button>
         )}
       </div>
 
-      {error && <ErrorMessage message={error} />}
+      {error && <ErrorMessage message={error} id="dream-error" />}
       
       {!isLoggedIn && anonymousAnalysisDone && !error && (
-        <p className="anonymous-warning">
+        <p className="anonymous-warning" role="alert">
           You've already analyzed one dream. Please login to analyze more dreams.
         </p>
       )}
-    </div>
+
+      <p className="keyboard-shortcut">
+        <small>Tip: Press Ctrl+Enter to analyze your dream</small>
+      </p>
+    </section>
   );
 };
 

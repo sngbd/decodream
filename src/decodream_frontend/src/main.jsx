@@ -1,3 +1,4 @@
+// Update main.js to include router
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
