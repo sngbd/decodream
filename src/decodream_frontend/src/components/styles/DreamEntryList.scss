@@ -1,0 +1,42 @@
+@import '../../variables';
+
+.entries-container {
+  @include dream-panel;
+  padding: 25px;
+  
+  .entries-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 15px;
+    
+    h2 {
+      margin: 0;
+    }
+  }
+  
+  .search-results {
+    color: $dream-text-secondary;
+    font-style: italic;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid $dream-panel-border;
+  }
+}
+
+@media (max-width: 768px) {
+  .entries-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    
+    .search-container {
+      width: 100%;
+      
+      .search-input {
+        width: 100% !important;
+      }
+    }
+  }
+}

@@ -1,0 +1,90 @@
+$dream-primary: #8a2be2;
+$dream-secondary: #4b0082;
+$dream-accent: #da70d6;
+$dream-background: #0f0524;
+$dream-text-primary: #e6e6fa;
+$dream-text-secondary: #b19cd9;
+$dream-highlight: #ff00ff;
+$dream-shadow: rgba(138, 43, 226, 0.5);
+$dream-panel: rgba(20, 10, 45, 0.8);
+$dream-panel-border: rgba(218, 112, 214, 0.5);
+$dream-danger: #ff355e;
+$dream-success: #00ffbf;
+
+$font-primary: 'Orbitron', sans-serif;
+$font-secondary: 'Rajdhani', sans-serif;
+$font-body: 'Quicksand', sans-serif;
+
+$text-glow: 0 0 5px rgba(138, 43, 226, 0.7), 0 0 10px rgba(138, 43, 226, 0.5);
+$button-glow: 0 0 10px rgba(218, 112, 214, 0.7), 0 0 20px rgba(138, 43, 226, 0.5);
+$panel-glow: 0 0 15px rgba(138, 43, 226, 0.3);
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 10px rgba(138, 43, 226, 0.5); }
+  50% { box-shadow: 0 0 20px rgba(218, 112, 214, 0.7); }
+  100% { box-shadow: 0 0 10px rgba(138, 43, 226, 0.5); }
+}
+
+@keyframes text-shimmer {
+  0% { color: $dream-text-primary; text-shadow: $text-glow; }
+  50% { color: $dream-accent; text-shadow: 0 0 8px rgba(218, 112, 214, 0.9); }
+  100% { color: $dream-text-primary; text-shadow: $text-glow; }
+}
+
+@mixin dream-panel {
+  background: $dream-panel;
+  border: 1px solid $dream-panel-border;
+  box-shadow: $panel-glow;
+  border-radius: 8px;
+  backdrop-filter: blur(5px);
+}
+
+@mixin dream-button {
+  background: linear-gradient(135deg, $dream-secondary, $dream-primary);
+  color: $dream-text-primary;
+  border: 1px solid $dream-accent;
+  border-radius: 4px;
+  padding: 10px 20px;
+  font-family: $font-primary;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow: $button-glow;
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    background: linear-gradient(135deg, $dream-primary, $dream-accent);
+    box-shadow: 0 0 15px rgba(218, 112, 214, 0.9);
+    transform: translateY(-2px);
+  }
+  
+  &:disabled {
+    background: linear-gradient(135deg, desaturate($dream-secondary, 40%), desaturate($dream-primary, 40%));
+    border-color: desaturate($dream-accent, 40%);
+    opacity: 0.7;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+@mixin scrollbar {
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: $dream-background;
+    border-radius: 8px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: $dream-primary;
+    border-radius: 8px;
+    border: 2px solid $dream-background;
+    
+    &:hover {
+      background: $dream-accent;
+    }
+  }
+}

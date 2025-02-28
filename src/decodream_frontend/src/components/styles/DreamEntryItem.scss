@@ -1,0 +1,148 @@
+@import '../../variables';
+
+.dream-entry-item {
+  @include dream-panel;
+  margin-bottom: 20px;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);
+  }
+  
+  .entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background: rgba(20, 10, 45, 0.9);
+    flex-wrap: wrap;
+    gap: 10px;
+    
+    .entry-dates {
+      p {
+        margin: 0;
+        font-size: 0.9em;
+        color: $dream-text-secondary;
+        font-family: $font-secondary;
+        
+        strong {
+          color: $dream-accent;
+        }
+      }
+      
+      .date-updated {
+        margin-top: 3px;
+      }
+    }
+    
+    .entry-actions {
+      display: flex;
+      gap: 10px;
+      
+      .edit-button {
+        @include dream-button;
+        padding: 6px 12px;
+        font-size: 0.9em;
+      }
+      
+      .delete-button {
+        @include dream-button;
+        background: linear-gradient(135deg, darken($dream-danger, 20%), $dream-danger);
+        border-color: $dream-danger;
+        padding: 6px 12px;
+        font-size: 0.9em;
+        
+        &:hover {
+          background: linear-gradient(135deg, $dream-danger, lighten($dream-danger, 10%));
+        }
+      }
+    }
+  }
+  
+  details {
+    .entry-summary {
+      padding: 15px 20px;
+      cursor: pointer;
+      position: relative;
+      font-family: $font-primary;
+      color: $dream-accent;
+      list-style: none;
+      transition: background-color 0.2s;
+      
+      &::-webkit-details-marker {
+        display: none;
+      }
+      
+      &::after {
+        content: '▼';
+        position: absolute;
+        right: 20px;
+        transition: transform 0.3s;
+      }
+      
+      &:hover {
+        background: rgba(138, 43, 226, 0.1);
+      }
+    }
+    
+    &[open] {
+      .entry-summary::after {
+        transform: rotate(180deg);
+      }
+    }
+    
+    .entry-content {
+      padding: 5px 20px 20px;
+      
+      h3 {
+        color: $dream-text-primary;
+        margin: 15px 0 10px;
+        position: relative;
+        display: inline-block;
+        
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: -5px;
+          left: 0;
+          width: 100%;
+          height: 1px;
+          background: linear-gradient(90deg, $dream-accent, transparent);
+        }
+      }
+      
+      .dream-text {
+        background: rgba(15, 5, 36, 0.8);
+        padding: 15px;
+        border-radius: 5px;
+        border-left: 3px solid $dream-accent;
+        white-space: pre-line;
+      }
+      
+      .analysis-content {
+        background: rgba(15, 5, 36, 0.8);
+        padding: 15px;
+        border-radius: 5px;
+        border-left: 3px solid $dream-primary;
+        @include scrollbar;
+        
+        p {
+          margin-top: 0;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .entry-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    
+    .entry-dates {
+      margin-bottom: 10px;
+    }
+  }
+}

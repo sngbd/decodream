@@ -1,0 +1,42 @@
+@import '../../variables';
+
+.search-container {
+  position: relative;
+  
+  .search-input {
+    padding: 10px 35px 10px 15px;
+    width: 250px;
+    max-width: 100%;
+    border: 1px solid $dream-panel-border;
+    border-radius: 20px;
+    background: rgba(15, 5, 36, 0.6);
+    color: $dream-text-primary;
+    transition: all 0.3s;
+    
+    &:focus {
+      width: 280px;
+      border-color: $dream-accent;
+      box-shadow: 0 0 10px rgba(218, 112, 214, 0.4);
+    }
+  }
+  
+  .clear-search {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: $dream-text-secondary;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 5px;
+    box-shadow: none;
+    
+    &:hover {
+      color: $dream-danger;
+      text-shadow: 0 0 5px rgba(255, 53, 94, 0.5);
+      transform: translateY(-50%) scale(1.1);
+    }
+  }
+}

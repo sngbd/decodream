@@ -1,0 +1,12 @@
+@import '../../variables';
+
+.error-message {
+  background: rgba(255, 53, 94, 0.1);
+  border: 1px solid rgba(255, 53, 94, 0.3);
+  border-radius: 4px;
+  padding: 10px 15px;
+  color: $dream-danger;
+  margin: 15px 0;
+  font-family: $font-secondary;
+  text-align: center;
+}

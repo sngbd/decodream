@@ -1,0 +1,101 @@
+@import '../../variables';
+
+.dream-analysis {
+  @include dream-panel;
+  padding: 25px;
+  margin-bottom: 30px;
+  
+  .analysis-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    
+    h2 {
+      margin: 0;
+    }
+    
+    .timestamp-info {
+      text-align: right;
+      
+      p {
+        margin: 0;
+        color: $dream-text-secondary;
+        font-size: 0.9em;
+        font-family: $font-secondary;
+        
+        strong {
+          color: $dream-accent;
+        }
+      }
+    }
+  }
+  
+  h3 {
+    margin: 20px 0 10px;
+    color: $dream-text-primary;
+    position: relative;
+    display: inline-block;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, $dream-accent, transparent);
+    }
+  }
+  
+  .dream-content {
+    white-space: pre-line;
+    background: rgba(15, 5, 36, 0.8);
+    padding: 15px;
+    border-radius: 5px;
+    border-left: 3px solid $dream-accent;
+    line-height: 1.6;
+    @include scrollbar;
+  }
+  
+  .markdown-content {
+    background: rgba(15, 5, 36, 0.8);
+    padding: 15px;
+    border-radius: 5px;
+    border-left: 3px solid $dream-primary;
+    @include scrollbar;
+    line-height: 1.6;
+    
+    ul, ol {
+      padding-left: 20px;
+      
+      li {
+        margin-bottom: 5px;
+      }
+    }
+    
+    blockquote {
+      border-left: 3px solid $dream-accent;
+      margin-left: 0;
+      padding-left: 15px;
+      color: $dream-text-secondary;
+    }
+    
+    code {
+      background: rgba(75, 0, 130, 0.3);
+      padding: 2px 5px;
+      border-radius: 3px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .analysis-header {
+    flex-direction: column;
+    
+    .timestamp-info {
+      text-align: left !important;
+      margin-top: 10px;
+    }
+  }
+}

@@ -1,0 +1,161 @@
+@import 'variables';
+
+body {
+  background: $dream-background;
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(138, 43, 226, 0.3) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(218, 112, 214, 0.2) 0%, transparent 40%);
+  color: $dream-text-primary;
+  font-family: $font-body;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  @include scrollbar;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: $font-primary;
+  margin-top: 0;
+  color: $dream-accent;
+  text-shadow: $text-glow;
+}
+
+h1 {
+  letter-spacing: 2px;
+  font-weight: 700;
+}
+
+h2 {
+  font-weight: 600;
+  letter-spacing: 1.5px;
+}
+
+img {
+  max-width: 50vw;
+  max-height: 25vw;
+  display: block;
+  margin: auto;
+}
+
+form {
+  display: flex;
+  justify-content: center;
+  gap: 0.5em;
+  flex-flow: row wrap;
+  max-width: 40vw;
+  margin: auto;
+  align-items: baseline;
+}
+
+a {
+  color: $dream-accent;
+  text-decoration: none;
+  transition: color 0.2s;
+  
+  &:hover {
+    color: $dream-highlight;
+    text-shadow: 0 0 8px rgba(255, 0, 255, 0.6);
+  }
+}
+
+button {
+  @include dream-button;
+}
+
+input, textarea {
+  background: rgba(15, 5, 36, 0.6);
+  border: 1px solid $dream-panel-border;
+  border-radius: 4px;
+  color: $dream-text-primary;
+  padding: 10px 10px;
+  font-family: $font-secondary;
+  transition: all 0.2s;
+  
+  &:focus {
+    outline: none;
+    border-color: $dream-accent;
+    box-shadow: 0 0 8px rgba(218, 112, 214, 0.5);
+  }
+  
+  &::placeholder {
+    color: $dream-text-secondary;
+    opacity: 0.7;
+  }
+}
+
+.app-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 1px solid $dream-panel-border;
+  margin-bottom: 30px;
+  
+  h1 {
+    margin: 0;
+    animation: text-shimmer 5s infinite alternate;
+  }
+  
+  p {
+    margin: 5px 0 0 0;
+    color: $dream-text-secondary;
+    font-family: $font-secondary;
+  }
+}
+
+footer {
+  margin-top: 60px;
+  text-align: center;
+  padding: 20px;
+  border-top: 1px solid $dream-panel-border;
+  color: $dream-text-secondary;
+  font-family: $font-secondary;
+  font-size: 0.9em;
+  
+  p {
+    margin: 5px 0;
+  }
+}
+
+.browser-warning {
+  display: none;
+}
+
+.markdown-content {
+  padding: 15px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.markdown-content h1, .markdown-content h2, .markdown-content h3 {
+  color: #333;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.markdown-content ul {
+  padding-left: 20px;
+}
+
+.markdown-content li {
+  margin-bottom: 0.5em;
+}
+
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    text-align: center;
+    
+    > div:first-child {
+      margin-bottom: 15px;
+    }
+  }
+}
