@@ -87,6 +87,23 @@
       border-radius: 3px;
     }
   }
+
+  .dream-image-section {
+    margin: 20px 0;
+    text-align: center;
+    
+    h3 {
+      color: $dream-accent;
+      margin-bottom: 15px;
+    }
+    
+    .dream-image {
+      max-width: 100%;
+      max-height: 500px;
+      border-radius: 12px;
+      margin: 0 auto;
+    }
+  }
 }
 
 @media (max-width: 768px) {

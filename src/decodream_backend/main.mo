@@ -28,9 +28,10 @@ actor Decodream {
     timestamp : Int, 
     dreamText : Text, 
     analysis : Text, 
-    updateTimestamp : Int
+    updateTimestamp : Int,
+    imageData : Text
   ) : async Bool {
-    db.updateEntry(user, timestamp, dreamText, analysis, updateTimestamp)
+    db.updateEntry(user, timestamp, dreamText, analysis, updateTimestamp, imageData)
   };
   
   public func deleteDreamEntry(user : Text, timestamp : Int) : async Bool {

@@ -134,6 +134,40 @@
       }
     }
   }
+
+  .entry-image {
+    margin: 20px 0;
+    padding: 15px;
+    border-radius: 16px;
+    background: $dream-panel;
+    
+    h3 {
+      color: $dream-accent;
+      margin-bottom: 15px;
+      font-size: 1.1rem;
+      text-align: center;
+    }
+    
+    .dream-image {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      max-height: 400px;
+      margin: 0 auto;
+      border-radius: 10px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      
+      &:hover {
+        transform: scale(1.02);
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .dream-image {
+        max-height: 300px;
+      }
+    }
+  }
 }
 
 @media (max-width: 768px) {

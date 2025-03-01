@@ -17,6 +17,7 @@ export const DreamProvider = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredEntries, setFilteredEntries] = useState([]);
   const [dreamToDelete, setDreamToDelete] = useState(null);
+  const [currentImage, setCurrentImage] = useState('');
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -51,7 +52,7 @@ export const DreamProvider = ({ children }) => {
     }
   };
 
-  const addDreamEntry = async (dreamText, analysis) => {
+  const addDreamEntry = async (dreamText, analysis, imageData) => {
     const now = Date.now();
     const timestamp = BigInt(now);
     
@@ -61,7 +62,8 @@ export const DreamProvider = ({ children }) => {
         analysis,
         timestamp,
         user: getPrincipal(),
-        lastUpdated: timestamp
+        lastUpdated: timestamp,
+        imageData
       });
       
       setCurrentEntryTimestamp(timestamp);
@@ -75,7 +77,7 @@ export const DreamProvider = ({ children }) => {
     }
   };
 
-  const updateDreamEntry = async (dreamText, analysis) => {
+  const updateDreamEntry = async (dreamText, analysis, imageData) => {
     if (!editingEntry) return false;
     
     const now = Date.now();
@@ -85,7 +87,8 @@ export const DreamProvider = ({ children }) => {
         editingEntry.timestamp,
         dreamText,
         analysis,
-        BigInt(now)
+        BigInt(now),
+        imageData
       );
       
       setCurrentEntryTimestamp(editingEntry.timestamp);
@@ -122,11 +125,13 @@ export const DreamProvider = ({ children }) => {
     setEditingEntry(entry);
     setCurrentEntryTimestamp(entry.timestamp);
     setLastUpdated(entry.lastUpdated ? Number(entry.lastUpdated) : null);
+    setCurrentImage(entry.imageData);
   };
 
   const resetCurrentDream = () => {
     setCurrentDream("");
     setCurrentAnalysis("");
+    setCurrentImage('');
     setEditingEntry(null);
     setCurrentEntryTimestamp(null);
     setLastUpdated(null);
@@ -164,6 +169,8 @@ export const DreamProvider = ({ children }) => {
     dreamToDelete,
     setDreamToDelete,
     clearDreamToDelete,
+    currentImage,
+    setCurrentImage,
   };
 
   return <DreamContext.Provider value={value}>{children}</DreamContext.Provider>;

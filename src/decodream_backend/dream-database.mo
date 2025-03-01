@@ -18,6 +18,7 @@ module {
         timestamp = entry.timestamp;
         user = entry.user;
         lastUpdated = entry.timestamp;
+        imageData = entry.imageData;
       };
 
       let userDreams = switch (dreamsByUser.get(entry.user)) {
@@ -50,7 +51,8 @@ module {
       timestamp : Int, 
       dreamText : Text, 
       analysis : Text, 
-      updateTimestamp : Int
+      updateTimestamp : Int,
+      imageData : Text
     ) : Bool {
       switch (dreamsByUser.get(user)) {
         case (null) { return false };
@@ -65,6 +67,7 @@ module {
                   timestamp = timestamp;
                   user = user;
                   lastUpdated = updateTimestamp;
+                  imageData = imageData;
                 };
               } else {
                 return entry;

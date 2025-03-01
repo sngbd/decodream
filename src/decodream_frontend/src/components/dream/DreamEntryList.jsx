@@ -8,7 +8,7 @@ import "../styles/DreamEntryList.scss";
 
 const DreamEntryList = () => {
   const { isLoggedIn } = useAuth();
-  const { dreamEntries, loading, searchQuery, dreamToDelete, setDreamToDelete, clearDreamToDelete, deleteDreamEntry } = useDreams();
+  const { dreamEntries, loading, searchQuery } = useDreams();
 
   if (!isLoggedIn) {
     return null;

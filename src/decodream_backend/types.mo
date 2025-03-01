@@ -7,5 +7,6 @@ module {
     timestamp : Int;
     user : Text;
     lastUpdated : Int;
+    imageData : Text;
   };
 }

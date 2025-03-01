@@ -8,7 +8,8 @@ const DreamAnalysis = () => {
     currentDream, 
     currentAnalysis, 
     currentEntryTimestamp, 
-    lastUpdated 
+    lastUpdated,
+    currentImage,
   } = useDreams();
 
   if (!currentAnalysis) {
@@ -42,6 +43,17 @@ const DreamAnalysis = () => {
       <div className="dream-content">
         {currentDream}
       </div>
+
+      {currentImage != "" && (
+        <div className="dream-image-section">
+          <h3>Dream Visualization</h3>
+          <img 
+            src={`data:image/png;base64,${currentImage}`} 
+            alt="Dream visualization"
+            className="dream-image"
+          />
+        </div>
+      )}
       
       <h3>Analysis:</h3>
       <div className="markdown-content">

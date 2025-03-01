@@ -20,13 +20,14 @@ const DreamForm = () => {
     setCurrentDream,
     setCurrentAnalysis,
     editingEntry,
-    setEditingEntry,
     error, 
     setError,
     addDreamEntry,
     updateDreamEntry,
     resetCurrentDream,
-    resetEditingState
+    resetEditingState,
+    currentImage,
+    setCurrentImage,
   } = useDreams();
 
   useEffect(() => {
@@ -58,7 +59,7 @@ const DreamForm = () => {
           messages: [
             {
               role: "user",
-              content: `Analyze this dream in Markdown format with headings and bullet points: ${dreamInput}`
+              content: `(Note: Do not show the Chain of Thought) Analyze this dream in Markdown format with headings and bullet points: ${dreamInput}`
             }
           ],
           model: "deepseek/deepseek-r1-distill-llama-70b:free",
@@ -71,6 +72,25 @@ const DreamForm = () => {
         }
       );
 
+
+      const responseImage = await axios.post(
+        `${import.meta.env.VITE_WORKERS_AI || 'http://localhost:3000'}/generate`,
+        {
+          prompt: `Generate a photorealistic illustration of the following dream: ${dreamInput}`,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (responseImage.status != 200) {
+        throw new Error(`Workers AI Wrapper API error: ${responseImage.statusText}`);
+      }
+
+      setCurrentImage(responseImage.data.image);
+
       if (!response.data?.choices?.[0]?.message?.content) {
         throw new Error("Invalid API response");
       }
@@ -82,12 +102,13 @@ const DreamForm = () => {
       if (!isLoggedIn) {
         markAnonymousAnalysisDone();
       } else if (editingEntry) {
-        await updateDreamEntry(dreamInput, analysisContent);
-        resetEditingState(); // Exit editing mode after update while preserving analysis
-        setDreamInput(""); // Clear the form after update while preserving analysis
+        await updateDreamEntry(dreamInput, analysisContent, responseImage.data.image);
+        resetEditingState();
+        setDreamInput("");
       } else {
-        await addDreamEntry(dreamInput, analysisContent);
-        setDreamInput(""); // Clear the form for new entries
+        console.log(currentImage);
+        await addDreamEntry(dreamInput, analysisContent, responseImage.data.image);
+        setDreamInput("");
       }
     } catch (error) {
       setError("Failed to analyze the dream. Please try again.");
@@ -109,7 +130,7 @@ const DreamForm = () => {
         onChange={(e) => setDreamInput(e.target.value)}
         className="dream-textarea"
       />
-      
+
       <div className="button-group">
         <button
           onClick={analyzeDream}

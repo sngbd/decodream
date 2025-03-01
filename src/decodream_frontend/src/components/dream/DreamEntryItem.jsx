@@ -5,7 +5,7 @@ import "../styles/DreamEntryItem.scss";
 
 const DreamEntryItem = ({ entry }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { selectDreamForEditing, deleteDreamEntry, setDreamToDelete } = useDreams();
+  const { selectDreamForEditing, setDreamToDelete, currentImage } = useDreams();
 
   const handleEdit = () => {
     selectDreamForEditing(entry);
@@ -59,6 +59,20 @@ const DreamEntryItem = ({ entry }) => {
           <div className="entry-content">
             <h3>Dream:</h3>
             <p className="dream-text">{entry.dreamText}</p>
+
+            {entry.imageData != "" && (
+              <div>
+                <h3>Dream Visualization:</h3>
+                <div className="entry-image">
+                  <img 
+                    src={`data:image/png;base64,${entry.imageData}`} 
+                    alt="Dream visualization" 
+                    className="dream-image"
+                  />
+                </div>
+              </div>
+            )}
+
             <h3>Analysis:</h3>
             <div className="analysis-content">
               <Markdown>{entry.analysis}</Markdown>
