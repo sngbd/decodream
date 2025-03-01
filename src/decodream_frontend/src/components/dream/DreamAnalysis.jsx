@@ -18,22 +18,44 @@ const DreamAnalysis = () => {
 
   const formatDate = (timestamp) => {
     if (!timestamp) return null;
-    return new Date(Number(timestamp)).toLocaleString();
+    
+    const date = new Date(Number(timestamp));
+    
+    // Check if date is valid
+    if (isNaN(date.getTime())) return null;
+    
+    return date.toLocaleString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
+  const createdDate = formatDate(currentEntryTimestamp);
+  const updatedDate = formatDate(lastUpdated);
+
   return (
-    <div className="dream-analysis">
+    <div 
+      className="dream-analysis" 
+      aria-labelledby="analysis-title"
+    >
       <div className="analysis-header">
-        <h2>Current Analysis</h2>
-        <div className="timestamp-info">
-          {currentEntryTimestamp && (
+        <h2 id="analysis-title">Dream Analysis</h2>
+        <div className="timestamp-info" aria-live="polite">
+          {createdDate && (
             <p>
-              <strong>Created:</strong> {formatDate(currentEntryTimestamp)}
+              <time dateTime={new Date(Number(currentEntryTimestamp)).toISOString()}>
+                <strong>Created:</strong> {createdDate}
+              </time>
             </p>
           )}
-          {lastUpdated && (
+          {updatedDate && lastUpdated !== currentEntryTimestamp && (
             <p>
-              <strong>Updated:</strong> {formatDate(lastUpdated)}
+              <time dateTime={new Date(Number(lastUpdated)).toISOString()}>
+                <strong>Updated:</strong> {updatedDate}
+              </time>
             </p>
           )}
         </div>

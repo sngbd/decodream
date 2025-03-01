@@ -1,3 +1,4 @@
+// Colors
 $dream-primary: #8a2be2;
 $dream-secondary: #4b0082;
 $dream-accent: #da70d6;
@@ -11,14 +12,23 @@ $dream-panel-border: rgba(218, 112, 214, 0.5);
 $dream-danger: #ff355e;
 $dream-success: #00ffbf;
 
+// Typography
 $font-primary: 'Orbitron', sans-serif;
 $font-secondary: 'Rajdhani', sans-serif;
 $font-body: 'Quicksand', sans-serif;
 
+// Effects
 $text-glow: 0 0 5px rgba(138, 43, 226, 0.7), 0 0 10px rgba(138, 43, 226, 0.5);
 $button-glow: 0 0 10px rgba(218, 112, 214, 0.7), 0 0 20px rgba(138, 43, 226, 0.5);
 $panel-glow: 0 0 15px rgba(138, 43, 226, 0.3);
 
+// Breakpoints
+$breakpoint-mobile: 576px;
+$breakpoint-tablet: 768px;
+$breakpoint-laptop: 992px;
+$breakpoint-desktop: 1200px;
+
+// Animations
 @keyframes pulse-glow {
   0% { box-shadow: 0 0 10px rgba(138, 43, 226, 0.5); }
   50% { box-shadow: 0 0 20px rgba(218, 112, 214, 0.7); }
@@ -31,6 +41,12 @@ $panel-glow: 0 0 15px rgba(138, 43, 226, 0.3);
   100% { color: $dream-text-primary; text-shadow: $text-glow; }
 }
 
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+// Mixins
 @mixin dream-panel {
   background: $dream-panel;
   border: 1px solid $dream-panel-border;
@@ -51,6 +67,7 @@ $panel-glow: 0 0 15px rgba(138, 43, 226, 0.3);
   text-transform: uppercase;
   box-shadow: $button-glow;
   transition: all 0.2s ease-in-out;
+  cursor: pointer;
   
   &:hover {
     background: linear-gradient(135deg, $dream-primary, $dream-accent);
@@ -87,4 +104,31 @@ $panel-glow: 0 0 15px rgba(138, 43, 226, 0.3);
       background: $dream-accent;
     }
   }
+}
+
+@mixin responsive($breakpoint) {
+  @if $breakpoint == mobile {
+    @media (max-width: $breakpoint-mobile) { @content; }
+  } @else if $breakpoint == tablet {
+    @media (max-width: $breakpoint-tablet) { @content; }
+  } @else if $breakpoint == laptop {
+    @media (max-width: $breakpoint-laptop) { @content; }
+  } @else if $breakpoint == desktop {
+    @media (max-width: $breakpoint-desktop) { @content; }
+  }
+}
+
+@mixin glassmorphism {
+  background: rgba($dream-panel, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba($dream-accent, 0.2);
+  box-shadow: 0 8px 32px rgba($dream-shadow, 0.2);
+}
+
+@mixin neon-text($color: $dream-accent) {
+  color: $color;
+  text-shadow: 
+    0 0 5px rgba($color, 0.8),
+    0 0 10px rgba($color, 0.5),
+    0 0 15px rgba($color, 0.3);
 }
