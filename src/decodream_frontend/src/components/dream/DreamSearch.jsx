@@ -46,7 +46,7 @@ const DreamSearch = () => {
       <input
         id="dream-search"
         ref={inputRef}
-        type="search"
+        type="text" // Changed from "search" to "text"
         placeholder="Search dreams... (Ctrl+/)"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}

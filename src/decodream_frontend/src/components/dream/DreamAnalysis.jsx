@@ -66,7 +66,7 @@ const DreamAnalysis = () => {
         {currentDream}
       </div>
 
-      {currentImage != "" && (
+      {currentImage && currentImage !== "" && (
         <div className="dream-image-section">
           <h3>Dream Visualization</h3>
           <img 

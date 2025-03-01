@@ -13,6 +13,8 @@
     
     h2 {
       margin: 0;
+      color: $dream-text-primary;
+      font-family: $font-primary;
     }
     
     .timestamp-info {
@@ -36,6 +38,7 @@
     color: $dream-text-primary;
     position: relative;
     display: inline-block;
+    font-family: $font-primary;
     
     &::after {
       content: '';
@@ -55,7 +58,11 @@
     border-radius: 5px;
     border-left: 3px solid $dream-accent;
     line-height: 1.6;
+    font-family: $font-body;
+    color: $dream-text-primary;
     @include scrollbar;
+    max-height: 300px;
+    overflow-y: auto;
   }
   
   .markdown-content {
@@ -65,6 +72,10 @@
     border-left: 3px solid $dream-primary;
     @include scrollbar;
     line-height: 1.6;
+    font-family: $font-body;
+    color: $dream-text-primary;
+    max-height: 500px;
+    overflow-y: auto;
     
     ul, ol {
       padding-left: 20px;
@@ -85,6 +96,50 @@
       background: rgba(75, 0, 130, 0.3);
       padding: 2px 5px;
       border-radius: 3px;
+      font-family: monospace;
+    }
+
+    a {
+      color: $dream-accent;
+      text-decoration: none;
+      position: relative;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        text-shadow: $text-glow;
+        
+        &::after {
+          width: 100%;
+        }
+      }
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 1px;
+        background-color: $dream-accent;
+        transition: width 0.3s ease;
+      }
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      color: $dream-text-primary;
+      margin-top: 20px;
+      margin-bottom: 10px;
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: linear-gradient(90deg, rgba($dream-accent, 0.7), transparent);
+      }
     }
   }
 
@@ -95,6 +150,13 @@
     h3 {
       color: $dream-accent;
       margin-bottom: 15px;
+      text-align: center;
+      
+      &::after {
+        background: linear-gradient(90deg, transparent, $dream-accent, transparent);
+        width: 50%;
+        left: 25%;
+      }
     }
     
     .dream-image {
@@ -102,17 +164,35 @@
       max-height: 500px;
       border-radius: 12px;
       margin: 0 auto;
+      box-shadow: $panel-glow;
+      border: 1px solid rgba($dream-accent, 0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      
+      &:hover {
+        transform: scale(1.02);
+        box-shadow: 0 0 25px rgba($dream-accent, 0.5);
+      }
     }
   }
 }
 
-@media (max-width: 768px) {
-  .analysis-header {
-    flex-direction: column;
+@media (max-width: $breakpoint-tablet) {
+  .dream-analysis {
+    padding: 15px;
     
-    .timestamp-info {
-      text-align: left !important;
-      margin-top: 10px;
+    .analysis-header {
+      flex-direction: column;
+      
+      .timestamp-info {
+        text-align: left;
+        margin-top: 10px;
+      }
+    }
+    
+    .dream-image-section {
+      .dream-image {
+        max-height: 300px;
+      }
     }
   }
 }

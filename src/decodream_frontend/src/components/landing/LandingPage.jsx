@@ -2,58 +2,17 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "./LandingPage.css";
+import Header from "../Header/Header";
 
 const LandingPage = () => {
   const { isLoggedIn, identity, login, logout, isAuthenticating } = useAuth();
 
-  
-  
   return (
-    <div className="app-container">
+    <>
       {/* Header/Navigation */}
-      <header className="main-header">
-        <div className="container">
-          <div className="header-content">
-            <div className="logo">
-              <Link to="/">Decodream</Link>
-              <p className="tagline-header">Dream Analysis on the Internet Computer</p>
-            </div>
-            <nav className="main-nav">
-              {isLoggedIn ? (
-                <div className="auth-container">
-                  <div className="user-principal">
-                    <span className="principal-label">Principal ID:</span> 
-                    <span className="principal-value">{identity.getPrincipal().toString().substring(0, 8)}...</span>
-                  </div>
-                  <Link to="/dreams" className="nav-link">
-                    <i className="fas fa-book-open nav-icon"></i> My Dreams
-                  </Link>
-                  <button 
-                    onClick={logout} 
-                    disabled={isAuthenticating}
-                    className="nav-btn"
-                  >
-                    <i className="fas fa-sign-out-alt nav-icon"></i>
-                    {isAuthenticating ? "Processing..." : "Logout"}
-                  </button>
-                </div>
-              ) : (
-                <button 
-                  onClick={login} 
-                  disabled={isAuthenticating}
-                  className="nav-btn"
-                >
-                  <i className="fas fa-sign-in-alt nav-icon"></i>
-                  {isAuthenticating ? "Connecting..." : "Login with Internet Identity"}
-                </button>
-              )}
-            </nav>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
-      <main>
         <div className="landing-page">
           <div className="hero-section">
             <div className="container">
@@ -107,11 +66,11 @@ const LandingPage = () => {
               <div className="features-grid">
                 <div className="feature-card">
                   <div className="icon-container">
-                  <img 
-            src="/images/record_dreams.png" 
-            alt="Record Dreams" 
-            className="feature-icon" 
-          />
+                    <img 
+                      src="/images/record_dreams.png" 
+                      alt="Record Dreams" 
+                      className="feature-icon" 
+                    />
                   </div>
                   <h3>Record Dreams</h3>
                   <p>
@@ -121,11 +80,11 @@ const LandingPage = () => {
                 
                 <div className="feature-card">
                   <div className="icon-container">
-                  <img 
-            src="/images/analyze_dream.png" 
-            alt="Analyze Patterns" 
-            className="feature-icon" 
-          />
+                    <img 
+                      src="/images/analyze_dream.png" 
+                      alt="Analyze Patterns" 
+                      className="feature-icon" 
+                    />
                   </div>
                   <h3>Analyze Patterns</h3>
                   <p>
@@ -135,11 +94,11 @@ const LandingPage = () => {
                 
                 <div className="feature-card">
                   <div className="icon-container">
-                  <img 
-            src="/images/ai_insight.png" 
-            alt="AI Insights" 
-            className="feature-icon" 
-          />
+                    <img 
+                      src="/images/ai_insight.png" 
+                      alt="AI Insights" 
+                      className="feature-icon" 
+                    />
                   </div>
                   <h3>AI Insights</h3>
                   <p>
@@ -214,6 +173,184 @@ const LandingPage = () => {
             </div>
           </div>
           
+          {/* Pricing Section */}
+          <div className="pricing-section">
+            <div className="container">
+              <div className="section-header">
+                <h2>Choose Your Plan</h2>
+                <p className="section-description">Select the perfect plan to unlock your dream insights</p>
+              </div>
+
+              <div className="pricing-grid">
+                {/* Free Tier */}
+                <div className="pricing-card">
+                  <div className="pricing-header">
+                    <h3>Dream Explorer</h3>
+                    <div className="price">
+                      <span className="amount">Free</span>
+                    </div>
+                    <p className="pricing-description">Great for beginners</p>
+                  </div>
+                  <div className="pricing-features">
+                    <ul>
+                      <li>
+                        <i className="fas fa-check feature-icon"></i>
+                        Record up to 10 dreams per month
+                      </li>
+                      <li>
+                        <i className="fas fa-check feature-icon"></i>
+                        Basic AI analysis of individual dreams
+                      </li>
+                      <li>
+                        <i className="fas fa-check feature-icon"></i>
+                        Limited access to pattern recognition (last 30 days only)
+                      </li>
+                      <li>
+                        <i className="fas fa-check feature-icon"></i>
+                        Web access only
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="pricing-cta">
+                    {isLoggedIn ? (
+                      <Link to="/dreams" className="btn btn-outline">
+                        Get Started
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={login}
+                        disabled={isAuthenticating}
+                        className="btn btn-outline"
+                      >
+                        {isAuthenticating ? "Connecting..." : "Get Started"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Premium Tier */}
+                <div className="pricing-card featured">
+                  <div className="popular-badge">Most Popular</div>
+                  <div className="pricing-header">
+                    <h3>Dream Analyst</h3>
+                    <div className="price">
+                      <span className="amount">1 ICP</span>
+                      <span className="period">/month</span>
+                    </div>
+                    <p className="pricing-description">Perfect for enthusiasts</p>
+                  </div>
+                  <div className="pricing-features">
+                    <ul>
+                      <li>
+                        <i className="fas fa-check feature-icon"></i>
+                        Unlimited dream recordings
+                      </li>
+                      <li>
+                        <i className="fas fa-check feature-icon"></i>
+                        Advanced AI analysis with deeper insights
+                      </li>
+                      <li>
+                        <i className="fas fa-check feature-icon"></i>
+                        Full pattern recognition across your entire dream history
+                      </li>
+                      <li>
+                        <i className="fas fa-check feature-icon"></i>
+                        Export and sharing capabilities
+                      </li>
+                      <li>
+                        <i className="fas fa-check feature-icon"></i>
+                        Priority support
+                      </li>
+                      <li>
+                        <i className="fas fa-check feature-icon"></i>
+                        Web and mobile access
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="pricing-cta">
+                    {isLoggedIn ? (
+                      <Link to="/upgrade" className="btn btn-primary">
+                        Upgrade Now
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={login}
+                        disabled={isAuthenticating}
+                        className="btn btn-primary"
+                      >
+                        {isAuthenticating ? "Connecting..." : "Sign Up"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Professional Tier */}
+                <div className="pricing-card">
+                  <div className="pricing-header">
+                    <h3>Dream Master</h3>
+                    <div className="price">
+                      <span className="amount">3 ICP</span>
+                      <span className="period">/month</span>
+                    </div>
+                    <p className="pricing-description">For serious dream explorers</p>
+                  </div>
+                  <div className="pricing-features">
+                    <ul>
+                      <li>
+                        <i className="fas fa-check feature-icon"></i>
+                        Everything in Premium
+                      </li>
+                      <li>
+                        <i className="fas fa-check feature-icon"></i>
+                        Advanced pattern correlation with waking life events
+                      </li>
+                      <li>
+                        <i className="fas fa-check feature-icon"></i>
+                        Custom symbol dictionary for personalized interpretations
+                      </li>
+                      <li>
+                        <i className="fas fa-check feature-icon"></i>
+                        Weekly/monthly summary reports with actionable insights
+                      </li>
+                      <li>
+                        <i className="fas fa-check feature-icon"></i>
+                        Group/family dream sharing (up to 5 accounts)
+                      </li>
+                      <li>
+                        <i className="fas fa-check feature-icon"></i>
+                        One-on-one consultation with dream analysis experts (1 session/month)
+                      </li>
+                      <li>
+                        <i className="fas fa-check feature-icon"></i>
+                        Early access to new features
+                      </li>
+                    </ul>
+                  </div>
+                  <div className="pricing-cta">
+                    {isLoggedIn ? (
+                      <Link to="/upgrade-pro" className="btn btn-outline">
+                        Go Pro
+                      </Link>
+                    ) : (
+                      <button
+                        onClick={login}
+                        disabled={isAuthenticating}
+                        className="btn btn-outline"
+                      >
+                        {isAuthenticating ? "Connecting..." : "Get Started"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="pricing-guarantee">
+                <i className="fas fa-shield-alt guarantee-icon"></i>
+                <p>All plans include secure storage on the Internet Computer blockchain and private data protection</p>
+              </div>
+            </div>
+          </div>
+          
           <div className="cta-section">
             <div className="container">
               <h2>Ready to Decode Your Dreams?</h2>
@@ -231,7 +368,6 @@ const LandingPage = () => {
             </div>
           </div>
         </div>
-      </main>
 
       {/* Footer */}
       <footer>
@@ -279,7 +415,7 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
-    </div>
+    </>
   );
 };
 

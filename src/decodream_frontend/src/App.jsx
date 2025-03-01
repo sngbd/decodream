@@ -7,7 +7,7 @@ import DreamAnalysis from "./components/dream/DreamAnalysis";
 import DreamEntryList from "./components/dream/DreamEntryList";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import LandingPage from "./components/landing/LandingPage";
-
+import Header from "./components/Header/Header";
 const App = () => {
   return (
     <Router>
@@ -22,8 +22,8 @@ const App = () => {
                   element={
                     <ProtectedRoute>
                       <div className="dream-container">
-                        <h1 className="sr-only">Dream Journal</h1>
                         <div className="dream-interface">
+                          <Header />
                           <DreamForm />
                           <DreamAnalysis />
                         </div>
