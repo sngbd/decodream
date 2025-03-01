@@ -5,6 +5,8 @@ import "./LandingPage.css";
 
 const LandingPage = () => {
   const { isLoggedIn, identity, login, logout, isAuthenticating } = useAuth();
+
+  
   
   return (
     <div className="app-container">
