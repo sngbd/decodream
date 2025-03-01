@@ -5,7 +5,7 @@ import "../styles/DreamEntryItem.scss";
 
 const DreamEntryItem = ({ entry }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { selectDreamForEditing, setDreamToDelete, currentImage } = useDreams();
+  const { selectDreamForEditing, setDreamToDelete } = useDreams();
 
   const handleEdit = () => {
     selectDreamForEditing(entry);
@@ -17,7 +17,6 @@ const DreamEntryItem = ({ entry }) => {
     
     const date = new Date(Number(timestamp));
     
-    // Check if date is valid
     if (isNaN(date.getTime())) return null;
     
     return date.toLocaleString(undefined, {
@@ -39,7 +38,6 @@ const DreamEntryItem = ({ entry }) => {
   const updatedDate = formatDate(entry.lastUpdated);
   const isUpdated = entry.lastUpdated && Number(entry.lastUpdated) !== Number(entry.timestamp);
   
-  // Create unique IDs for ARIA labeling
   const detailsId = `dream-details-${entryId}`;
   const summaryId = `dream-summary-${entryId}`;
 

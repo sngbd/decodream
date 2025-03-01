@@ -1,8 +1,5 @@
 @import 'variables';
 
-/* ------------------------
-   Reset & Base Styles
-   ------------------------ */
 * {
   margin: 0;
   padding: 0;
@@ -29,9 +26,6 @@ body {
   margin: 0;
 }
 
-/* ------------------------
-   Typography
-   ------------------------ */
 h1, h2, h3, h4, h5, h6 {
   font-family: $font-primary;
   margin-bottom: 1rem;
@@ -71,7 +65,6 @@ h3 {
 }
 
 p {
-  margin-bottom: 1rem;
   line-height: 1.7;
 }
 
@@ -125,23 +118,6 @@ a {
     transform: translateX(-50%);
     border-radius: 3px;
     box-shadow: 0 0 10px rgba($dream-accent, 0.5);
-  }
-}
-
-/* ------------------------
-   Layout Components
-   ------------------------ */
-.app-container {
-  max-width: 100%;
-  margin: 0 auto;
-  padding: 0 2rem; /* Added horizontal padding */
-  
-  @include responsive(tablet) {
-    padding: 0 1.5rem; /* Responsive padding for tablets */
-  }
-  
-  @include responsive(mobile) {
-    padding: 0 1rem; /* Responsive padding for mobile */
   }
 }
 
@@ -200,7 +176,7 @@ a {
 
 .container {
   width: 100%;
-  max-width: 1440px; /* Added max-width for large screens */
+  max-width: 1440px;
   padding-left: 2rem;
   padding-right: 2rem;
   margin-left: auto;
@@ -224,9 +200,9 @@ a {
 .dream-panel {
   @include dream-panel;
   padding: 1.5rem;
-  margin-bottom: 2rem; /* Added margin bottom */
+  margin-bottom: 2rem;
   width: 100%;
-  border-radius: 8px; /* Added border radius */
+  border-radius: 8px;
   
   &.with-spacing {
     margin: 2rem;
@@ -238,9 +214,6 @@ a {
   }
 }
 
-/* ------------------------
-   UI Components
-   ------------------------ */
 .btn {
   @include dream-button;
   
@@ -388,16 +361,12 @@ textarea {
   min-height: 100px;
 }
 
-/* ------------------------
-   Header & Footer
-   ------------------------ */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 1.5rem 2rem;
   border-bottom: 1px solid $dream-panel-border;
-  margin-bottom: 2rem; /* Added margin */
   
   .header-content {
     flex: 1;
@@ -460,9 +429,6 @@ footer {
   }
 }
 
-/* ------------------------
-   Utility Classes
-   ------------------------ */
 .text-center { text-align: center; }
 .text-left { text-align: left; }
 .text-right { text-align: right; }
@@ -498,7 +464,6 @@ footer {
 .p-4 { padding: 2rem; }
 .p-5 { padding: 3rem; }
 
-/* Added new padding utility classes */
 .px-1 { padding-left: 0.5rem; padding-right: 0.5rem; }
 .px-2 { padding-left: 1rem; padding-right: 1rem; }
 .px-3 { padding-left: 1.5rem; padding-right: 1.5rem; }
@@ -544,7 +509,6 @@ footer {
   align-items: center;
 }
 
-/* Fullscreen section class */
 .fullscreen-section {
   min-height: 100vh;
   width: 100%;
@@ -552,14 +516,13 @@ footer {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 2rem; /* Added padding */
+  padding: 2rem;
 }
 
-/* Main content area */
 main {
-  min-height: calc(100vh - 200px); /* Adjust based on header/footer height */
+  min-height: calc(100vh - 200px);
   width: 100%;
-  padding: 0 2rem; /* Added horizontal padding */
+  padding: 0 2rem;
   
   @include responsive(tablet) {
     padding: 0 1.5rem;
@@ -570,15 +533,11 @@ main {
   }
 }
 
-/* New content section class */
 .content-section {
   padding: 3rem 0;
   margin-bottom: 2rem;
 }
 
-/* ------------------------
-   Responsive Adjustments
-   ------------------------ */
 @include responsive(tablet) {
   .hidden-tablet {
     display: none;
@@ -590,10 +549,6 @@ main {
     display: none;
   }
   
-  .app-container {
-    padding: 0 1rem;
-  }
-  
   h1 {
     font-size: 2rem;
   }
@@ -603,9 +558,6 @@ main {
   }
 }
 
-/* ------------------------
-   Browser Warning
-   ------------------------ */
 .browser-warning {
   display: none;
   background: rgba($dream-danger, 0.1);
@@ -619,4 +571,25 @@ main {
   @supports not (backdrop-filter: blur(10px)) {
     display: block;
   }
+}
+
+.markdown-content {
+  padding: 15px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.markdown-content h1, .markdown-content h2, .markdown-content h3 {
+  color: #333;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.markdown-content ul {
+  padding-left: 20px;
+}
+
+.markdown-content li {
+  margin-bottom: 0.5em;
 }

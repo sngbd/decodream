@@ -130,6 +130,133 @@
         
         p {
           margin-top: 0;
+          margin-bottom: 1rem;
+          line-height: 1.6;
+          color: $dream-text-primary;
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+          color: $dream-accent;
+          margin-top: 1.5rem;
+          margin-bottom: 1rem;
+          font-family: $font-primary;
+          font-weight: 600;
+        }
+        
+        h1 { font-size: 1.8rem; }
+        h2 { font-size: 1.5rem; }
+        h3 { font-size: 1.3rem; }
+        h4 { font-size: 1.2rem; }
+        h5 { font-size: 1.1rem; }
+        h6 { font-size: 1rem; }
+        
+        ul, ol {
+          margin-bottom: 1.5rem;
+          padding-left: 1.5rem;
+          
+          li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+            
+            &::marker {
+              color: $dream-accent;
+            }
+          }
+        }
+        
+        blockquote {
+          border-left: 4px solid $dream-accent;
+          padding: 0.5rem 0 0.5rem 1rem;
+          margin: 1.5rem 0;
+          background: rgba(138, 43, 226, 0.1);
+          font-style: italic;
+          
+          p {
+            color: $dream-text-secondary;
+            margin: 0.5rem 0;
+          }
+        }
+        
+        pre {
+          background: rgba(10, 2, 25, 0.8);
+          padding: 1rem;
+          border-radius: 5px;
+          overflow-x: auto;
+          margin: 1.5rem 0;
+          border: 1px solid rgba(138, 43, 226, 0.3);
+          
+          code {
+            font-family: 'Courier New', monospace;
+            color: $dream-text-primary;
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+          }
+        }
+        
+        code {
+          background: rgba(138, 43, 226, 0.2);
+          color: $dream-accent;
+          font-family: 'Courier New', monospace;
+          padding: 0.2rem 0.4rem;
+          border-radius: 3px;
+          font-size: 0.9em;
+        }
+        
+        a {
+          color: $dream-highlight;
+          text-decoration: none;
+          border-bottom: 1px dashed $dream-highlight;
+          transition: color 0.2s, border-bottom 0.2s;
+          
+          &:hover {
+            color: lighten($dream-highlight, 10%);
+            border-bottom: 1px solid lighten($dream-highlight, 10%);
+          }
+        }
+        
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 1.5rem 0;
+          
+          th {
+            background: rgba(75, 0, 130, 0.4);
+            color: $dream-text-primary;
+            font-weight: 600;
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 2px solid $dream-accent;
+          }
+          
+          td {
+            padding: 0.8rem;
+            border-bottom: 1px solid rgba(138, 43, 226, 0.2);
+          }
+          
+          tr:nth-child(even) {
+            background: rgba(138, 43, 226, 0.05);
+          }
+          
+          tr:hover {
+            background: rgba(138, 43, 226, 0.1);
+          }
+        }
+        
+        hr {
+          border: 0;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, $dream-accent, transparent);
+          margin: 2rem 0;
+        }
+        
+        strong {
+          color: $dream-accent;
+          font-weight: 600;
+        }
+        
+        em {
+          color: $dream-text-secondary;
         }
       }
     }
@@ -155,10 +282,13 @@
       max-height: 400px;
       margin: 0 auto;
       border-radius: 10px;
+      border: 1px solid rgba($dream-accent, 0.3);
+      box-shadow: $panel-glow;
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       
       &:hover {
         transform: scale(1.02);
+        box-shadow: $button-glow;
       }
     }
     

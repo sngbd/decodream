@@ -119,7 +119,6 @@ const DreamForm = () => {
   };
 
   const handleKeyDown = (e) => {
-    // Allow submitting with Ctrl+Enter or Cmd+Enter
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       analyzeDream();
     }

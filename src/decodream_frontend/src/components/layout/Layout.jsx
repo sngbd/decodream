@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "../styles/LoadingOverlay.scss";
 import Header from "./Header";
+import Footer from "./Footer";
 import ConfirmDialog from "../common/ConfirmDialog";
 import Loading from "../common/Loading";
 import { useDreams } from "../../context/DreamContext";
@@ -10,13 +11,10 @@ const Layout = ({ children }) => {
   const [isDeletingDream, setIsDeletingDream] = useState(false);
 
   return (
-    <div className="app-container">
+    <>
       <Header />
-      <main>{children}</main>
-      <footer>
-        <p>Decodream - Powered by Internet Computer</p>
-        <p>© {new Date().getFullYear()} Decodream</p>
-      </footer>
+      {children}
+      <Footer />
 
       {dreamToDelete && (
         <ConfirmDialog
@@ -41,7 +39,7 @@ const Layout = ({ children }) => {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

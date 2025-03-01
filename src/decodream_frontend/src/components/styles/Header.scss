@@ -1,8 +1,7 @@
-/* Header styles */
 .main-header {
     background-color: rgba(10, 10, 26, 0.8);
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px); /* Safari support */
+    -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 4px 20px rgba(0, 204, 255, 0.15);
     padding: 18px 0;
     position: sticky;
@@ -45,6 +44,7 @@
     position: relative;
     text-decoration: none;
     transition: all 0.3s ease;
+    text-transform: uppercase;
   }
   
   .logo a:hover {
@@ -181,7 +181,6 @@
     transform: none;
   }
   
-  /* Screen reader only text */
   .sr-only {
     border: 0;
     clip: rect(0, 0, 0, 0);
@@ -193,7 +192,6 @@
     width: 1px;
   }
   
-  /* Mobile menu */
   .mobile-menu-toggle {
     display: none;
     font-size: 1.5rem;
@@ -212,7 +210,6 @@
     text-shadow: 0 0 8px rgba(0, 204, 255, 0.5);
   }
   
-  /* Responsive styles */
   @media (max-width: 768px) {
     .main-header {
       padding: 15px 0;

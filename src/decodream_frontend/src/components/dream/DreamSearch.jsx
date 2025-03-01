@@ -8,20 +8,17 @@ const DreamSearch = () => {
 
   const handleClear = () => {
     setSearchQuery("");
-    // Focus back on the input after clearing
     if (inputRef.current) {
       inputRef.current.focus();
     }
   };
 
   const handleKeyDown = (e) => {
-    // Clear search on Escape key
     if (e.key === "Escape" && searchQuery) {
       handleClear();
     }
   };
 
-  // Set focus to the search input when pressing Ctrl+/
   useEffect(() => {
     const handleKeyboardShortcut = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === "/") {
@@ -46,7 +43,7 @@ const DreamSearch = () => {
       <input
         id="dream-search"
         ref={inputRef}
-        type="text" // Changed from "search" to "text"
+        type="text"
         placeholder="Search dreams... (Ctrl+/)"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}

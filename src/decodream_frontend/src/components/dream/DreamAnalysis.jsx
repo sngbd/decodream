@@ -21,7 +21,6 @@ const DreamAnalysis = () => {
     
     const date = new Date(Number(timestamp));
     
-    // Check if date is valid
     if (isNaN(date.getTime())) return null;
     
     return date.toLocaleString(undefined, {

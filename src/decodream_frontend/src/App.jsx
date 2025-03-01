@@ -5,37 +5,40 @@ import { DreamProvider } from "./context/DreamContext";
 import DreamForm from "./components/dream/DreamForm";
 import DreamAnalysis from "./components/dream/DreamAnalysis";
 import DreamEntryList from "./components/dream/DreamEntryList";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
-import LandingPage from "./components/landing/LandingPage";
-import Header from "./components/Header/Header";
+import LandingPage from "./components/layout/LandingPage";
+import Layout from "./components/layout/Layout";
+
 const App = () => {
   return (
     <Router>
       <AuthProvider>
         <DreamProvider>
-          <div className="app-container">
-            <main>
-              <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route 
-                  path="/dreams" 
-                  element={
-                    <ProtectedRoute>
-                      <div className="dream-container">
-                        <div className="dream-interface">
-                          <Header />
-                          <DreamForm />
-                          <DreamAnalysis />
-                        </div>
-                        <DreamEntryList />
-                      </div>
-                    </ProtectedRoute>
-                  } 
-                />
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </main>
-          </div>
+          <Layout>
+            <Routes>
+              <Route 
+                path="/dreams" 
+                element={
+                  <>
+                    <DreamForm />
+                    <DreamAnalysis />
+                    <DreamEntryList />
+                  </>
+                } 
+              />
+              <Route
+                path="/"
+                element={
+                  <LandingPage />
+                } 
+              />
+              <Route
+                path="*"
+                element={
+                  <Navigate to="/" replace />
+                } 
+              />
+            </Routes>
+          </Layout>
         </DreamProvider>
       </AuthProvider>
     </Router>

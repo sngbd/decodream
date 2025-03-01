@@ -22,7 +22,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
-    if (isAuthenticating) return; // Prevent double-clicks
+    if (isAuthenticating) return;
     clear();
     navigate('/');
   };
@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
     anonymousAnalysisDone,
     markAnonymousAnalysisDone,
     isLoggedIn: !!identity,
-    isAuthenticated: !!identity, // Adding for compatibility with existing code
+    isAuthenticated: !!identity,
     getPrincipal: () => identity?.getPrincipal().toString(),
   };
 
