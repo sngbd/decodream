@@ -1,80 +1,29 @@
 import DreamDatabase "./dream-database";
-import Text "mo:base/Text";
+import ShareManager "./share-manager";
+import NFTManager "./nft-manager";
+import GalleryManager "./gallery-manager";
 import Types "./types";
-import Time "mo:base/Time";
-import HashMap "mo:base/HashMap";
-import Iter "mo:base/Iter";
-import Nat32 "mo:base/Nat32";
-import Int "mo:base/Int";
-import Principal "mo:base/Principal";
-import Buffer "mo:base/Buffer";
-import Nat "mo:base/Nat";
-import Hash "mo:base/Hash";
 
 actor Decodream {
-  private func natHash(n: Nat) : Hash.Hash {
-    Text.hash(Nat.toText(n))
+  stable var dreamEntries : [(Text, [Types.DreamEntry])] = [];
+  stable var dreamShares : [(Text, [(Text, Types.ShareableDreamEntry)])] = [];
+  stable var nftData : {
+    tokens : [(Nat, Types.DreamNFT)];
+    ownedTokens : [(Text, [Nat])];
+    mintedDreams : [(Text, Int)];
+    nextTokenId : Nat;
+  } = {
+    tokens = [];
+    ownedTokens = [];
+    mintedDreams = [];
+    nextTokenId = 0;
   };
+  stable var galleriesShared : [(Text, Bool)] = [];
 
-  stable var dreamEntries : [Types.DreamEntry] = [];
-  stable var shareLinksEntries : [(Text, Types.ShareableDreamEntry)] = [];
-
-  stable var nftEntries : [Types.DreamNFT] = [];
-  stable var nextTokenId : Nat = 1;
-  
-  let collection : Types.Collection = {
-    name = "Dream Visions";
-    symbol = "DREAM";
-    royalties = 0;
-    royaltyRecipient = {
-      owner = Principal.fromText("aaaaa-aa");
-      subaccount = null;
-    };
-    description = "AI-generated visualizations of dreams from the Decodream platform";
-    image = "";
-    totalSupply = 0;
-  };
-  
-  private var db = DreamDatabase.DreamDatabase();
-  private var shareLinks = HashMap.HashMap<Text, Types.ShareableDreamEntry>(10, Text.equal, Text.hash);
-  private var tokens = HashMap.HashMap<Nat, Types.DreamNFT>(10, Nat.equal, natHash);
-  private var ownedTokens = HashMap.HashMap<Principal, Buffer.Buffer<Nat>>(10, Principal.equal, Principal.hash);
-  
-  system func preupgrade() {
-    dreamEntries := db.getAllEntries();
-    shareLinksEntries := Iter.toArray(shareLinks.entries());
-
-    let tokenArr = Buffer.Buffer<Types.DreamNFT>(tokens.size());
-    for ((_, token) in tokens.entries()) {
-      tokenArr.add(token);
-    };
-    nftEntries := Buffer.toArray(tokenArr);
-  };
-  
-  system func postupgrade() {
-    db.populateFromEntries(dreamEntries);
-    shareLinks := HashMap.fromIter<Text, Types.ShareableDreamEntry>(
-      shareLinksEntries.vals(), 10, Text.equal, Text.hash
-    );
-
-    tokens := HashMap.HashMap<Nat, Types.DreamNFT>(nftEntries.size(), Nat.equal, natHash);
-    ownedTokens := HashMap.HashMap<Principal, Buffer.Buffer<Nat>>(10, Principal.equal, Principal.hash);
-    
-    for (token in nftEntries.vals()) {
-      tokens.put(token.tokenId, token);
-      
-      switch (ownedTokens.get(token.owner)) {
-        case (null) {
-          let newBuffer = Buffer.Buffer<Nat>(1);
-          newBuffer.add(token.tokenId);
-          ownedTokens.put(token.owner, newBuffer);
-        };
-        case (?buffer) {
-          buffer.add(token.tokenId);
-        };
-      };
-    };
-  };
+  private var db = DreamDatabase.DreamDatabase(dreamEntries);
+  private var shareManager = ShareManager.ShareManager(db, dreamShares);
+  private var nftManager = NFTManager.NFTManager(db, nftData);
+  private var galleryManager = GalleryManager.GalleryManager(galleriesShared, nftManager);
   
   public func addDreamEntry(entry : Types.DreamEntry) : async () {
     db.addEntry(entry);
@@ -92,238 +41,128 @@ actor Decodream {
     updateTimestamp : Int,
     imageData : Text
   ) : async Bool {
-    db.updateEntry(user, timestamp, dreamText, analysis, updateTimestamp, imageData)
+    let isMinted = await nftManager.isDreamMinted(user, timestamp);
+    if (isMinted) {
+      return false;
+    };
+    return db.updateEntry(user, timestamp, dreamText, analysis, updateTimestamp, imageData);
   };
   
   public func deleteDreamEntry(user : Text, timestamp : Int) : async Bool {
-    for ((shareId, entry) in shareLinks.entries()) {
-      if (entry.originalUser == user and entry.originalTimestamp == timestamp) {
-        shareLinks.delete(shareId);
-      };
-    };
-    
-    db.deleteEntry(user, timestamp)
-  };
-  
-  public func createShareableLink(user : Text, timestamp : Int) : async ?Text {
-    let entry = db.getEntryByTimestamp(user, timestamp);
-    
-    switch (entry) {
-      case (null) { 
-        return null; 
-      };
-      case (?dreamEntry) {
-        let currentTime = Time.now();
-        let hashInput = user # Int.toText(timestamp) # Int.toText(currentTime);
-        let shareId = generateShareId(hashInput);
-        
-        let shareableEntry : Types.ShareableDreamEntry = {
-          dreamText = dreamEntry.dreamText;
-          analysis = dreamEntry.analysis;
-          timestamp = dreamEntry.timestamp;
-          lastUpdated = dreamEntry.lastUpdated;
-          imageData = dreamEntry.imageData;
-          originalUser = user;
-          originalTimestamp = timestamp;
-          created = currentTime;
-        };
-        
-        shareLinks.put(shareId, shareableEntry);
-        return ?shareId;
-      };
-    };
-  };
-  
-  private func generateShareId(input : Text) : Text {
-    let hashValue = Text.hash(input);
-    let alphanumeric = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let chars = Iter.toArray(Text.toIter(alphanumeric));
-    var id = "";
-
-    var remainingHash = Nat32.toNat(hashValue);
-    for (_ in Iter.range(0, 7)) {
-      let index = remainingHash % 62;
-      let char = chars[index];
-      id := id # Text.fromChar(char);
-      remainingHash := remainingHash / 62;
+    let isMinted = await nftManager.isDreamMinted(user, timestamp);
+    if (isMinted) {
+      return false;
     };
 
-    return id;
+    let _ = shareManager.revokeAllSharesForDream(user, timestamp);
+    return db.deleteEntry(user, timestamp);
+  };
+  
+  public query func isDreamShared(userId : Text, timestamp : Int) : async Bool {
+    shareManager.isDreamShared(userId, timestamp)
+  };
+  
+  public shared func createShareableLink(userId : Text, timestamp : Int) : async [Text] {
+    shareManager.createShareableLink(userId, timestamp)
+  };
+  
+  public shared func revokeDreamShare(userId : Text, timestamp : Int) : async Bool {
+    shareManager.revokeDreamShare(userId, timestamp)
   };
   
   public query func getSharedDream(shareId : Text) : async ?Types.ShareableDreamEntry {
-    shareLinks.get(shareId)
+    shareManager.getSharedDream(shareId)
   };
   
   public query func getShareLinksForUser(user : Text) : async [(Text, Types.ShareableDreamEntry)] {
-    let userLinks = Iter.filter<(Text, Types.ShareableDreamEntry)>(
-      shareLinks.entries(), 
-      func((_, entry)) : Bool { entry.originalUser == user }
-    );
-    
-    return Iter.toArray(userLinks);
+    shareManager.getShareLinksForUser(user)
   };
   
   public func deleteShareLink(user : Text, shareId : Text) : async Bool {
-    switch (shareLinks.get(shareId)) {
-      case (null) { 
-        return false;
-      };
-      case (?entry) {
-        if (entry.originalUser != user) {
-          return false;
-        };
-        
-        shareLinks.delete(shareId);
-        return true;
-      };
-    };
-  };
- 
-  public query func icrc7_collection() : async Types.Collection {
-    return collection;
+    shareManager.deleteShareLink(user, shareId)
   };
   
-  public query func icrc7_total_supply() : async Nat {
-    return tokens.size();
+  public shared func isDreamMinted(userId : Text, timestamp : Int) : async Bool {
+    await nftManager.isDreamMinted(userId, timestamp)
   };
   
-  public query func icrc7_owner_of(token_id : Nat) : async ?Types.Account {
-    switch (tokens.get(token_id)) {
-      case (null) { null };
-      case (?token) {
-        ?{ owner = token.owner; subaccount = null };
-      };
-    };
+  public shared func mintDreamNFT(user: Text, timestamp : Int, description : Text) : async ?Int {
+    await nftManager.mintDreamNFT(user, timestamp, description)
   };
   
-  public query func icrc7_tokens_of(account : Types.Account) : async [Nat] {
-    switch (ownedTokens.get(account.owner)) {
-      case (null) { [] };
-      case (?buffer) { Buffer.toArray(buffer) };
-    };
-  };
-  
-  public query func icrc7_is_authorized(token_id : Nat, account : Types.Account) : async Bool {
-    switch (tokens.get(token_id)) {
-      case (null) { false };
-      case (?token) {
-        Principal.equal(token.owner, account.owner)
-      };
-    };
-  };
-  
-  public query func icrc7_metadata(token_id : Nat) : async ?Types.Metadata {
-    switch (tokens.get(token_id)) {
-      case (null) { null };
-      case (?token) { ?token.metadata };
-    };
-  };
-  
-  public shared func icrc7_transfer() : async Types.TransferResult {
-    return #Err(#Unauthorized);
-  };
-  
-  public shared func mintDreamNFT(user: Text, timestamp : Int, name : Text, description : Text) : async ?Nat {
-    let entry = db.getEntryByTimestamp(user, timestamp);
-    
-    switch (entry) {
-      case (null) { 
-        return null;
-      };
-      case (?dreamEntry) {
-        if (dreamEntry.user != user) {
-          return null;
-        };
-        
-        if (Text.size(dreamEntry.imageData) == 0) {
-          return null;
-        };
-
-        let imageData = if (Text.size(dreamEntry.imageData) > 500000) {
-          "data:image/png;base64,..."
-        } else {
-          dreamEntry.imageData
-        };
-        
-        let metadata : Types.Metadata = {
-          name = name;
-          description = description;
-          image = imageData; 
-          attributes = [
-            ("dreamTimestamp", #int(timestamp)),
-            ("dreamText", #text(
-              if (Text.size(dreamEntry.dreamText) > 1000) {
-                let chars = Text.toIter(dreamEntry.dreamText);
-                var count = 0;
-                var truncated = "";
-                
-                label l loop {
-                  switch (chars.next()) {
-                    case (null) { break l };
-                    case (?c) {
-                      if (count >= 1000) { break l };
-                      truncated := truncated # Text.fromChar(c);
-                      count += 1;
-                    };
-                  };
-                };
-                
-                truncated # "..."
-              } else {
-                dreamEntry.dreamText
-              }
-            )),
-            ("mintedAt", #int(Time.now())),
-          ];
-        };
-        
-        let tokenId = nextTokenId;
-        nextTokenId += 1;
-        
-        let newNFT : Types.DreamNFT = {
-          tokenId = tokenId;
-          owner = Principal.fromText(user);
-          dreamTimestamp = timestamp;
-          metadata = metadata;
-          minted = Time.now();
-        };
-        
-        tokens.put(tokenId, newNFT);
-        
-        switch (ownedTokens.get(Principal.fromText(user))) {
-          case (null) {
-            let newBuffer = Buffer.Buffer<Nat>(1);
-            newBuffer.add(tokenId);
-            ownedTokens.put(Principal.fromText(user), newBuffer);
-          };
-          case (?buffer) {
-            buffer.add(tokenId);
-          };
-        };
-        
-        return ?tokenId;
-      };
-    };
+  public shared func burnDreamNFT(userId : Text, timestamp : Int) : async Bool {
+    await nftManager.burnDreamNFT(userId, timestamp)
   };
   
   public query func getMyDreamNFTs(user : Text) : async [Types.DreamNFT] {
-    switch (ownedTokens.get(Principal.fromText(user))) {
-      case (null) { return [] };
-      case (?buffer) {
-        let result = Buffer.Buffer<Types.DreamNFT>(buffer.size());
-        for (tokenId in buffer.vals()) {
-          switch (tokens.get(tokenId)) {
-            case (null) {};
-            case (?token) { result.add(token) };
-          };
-        };
-        return Buffer.toArray(result);
-      };
-    };
+    nftManager.getMyDreamNFTs(user)
   };
   
   public query func getDreamNFT(tokenId : Nat) : async ?Types.DreamNFT {
-    tokens.get(tokenId)
+    nftManager.getDreamNFT(tokenId)
+  };
+  
+  public query func icrc7_collection() : async Types.Collection {
+    nftManager.icrc7_collection()
+  };
+  
+  public query func icrc7_total_supply() : async Nat {
+    nftManager.icrc7_total_supply()
+  };
+  
+  public query func icrc7_owner_of(token_id : Nat) : async ?Types.Account {
+    nftManager.icrc7_owner_of(token_id)
+  };
+  
+  public query func icrc7_tokens_of(account : Types.Account) : async [Nat] {
+    nftManager.icrc7_tokens_of(account)
+  };
+  
+  public query func icrc7_is_authorized(token_id : Nat, account : Types.Account) : async Bool {
+    nftManager.icrc7_is_authorized(token_id, account)
+  };
+  
+  public query func icrc7_metadata(token_id : Nat) : async ?Types.Metadata {
+    nftManager.icrc7_metadata(token_id)
+  };
+  
+  public shared func icrc7_transfer() : async Types.TransferResult {
+    nftManager.icrc7_transfer()
+  };
+
+  public shared func toggleGallerySharing(principal : Text, isPublic : Bool) : async Bool {
+   galleryManager.toggleGallerySharing(principal, isPublic)
+  };
+
+  public shared func isGalleryPublic(principal : Text) : async Bool {
+    galleryManager.isGalleryPublic(principal)
+  };
+
+  public shared func getPublicGallery(principal : Text) : async [Types.DreamNFT] {
+    galleryManager.getPublicGallery(principal)
+  };
+  
+  system func preupgrade() {
+    dreamEntries := db.getAllEntries();
+    dreamShares := shareManager.getAllShares();
+    nftData := {
+      tokens = nftManager.getAllTokens();
+      ownedTokens = nftManager.getAllOwnedTokens();
+      mintedDreams = nftManager.getAllMintedDreams();
+      nextTokenId = nftManager.getNextTokenId();
+    };
+    galleriesShared := galleryManager.getAllGalleries();
+  };
+  
+  system func postupgrade() {
+    db := DreamDatabase.DreamDatabase(dreamEntries);
+    shareManager := ShareManager.ShareManager(db, dreamShares);
+    nftManager := NFTManager.NFTManager(db, nftData);
+    galleryManager := GalleryManager.GalleryManager(galleriesShared, nftManager);
+    
+    db.postupgrade();
+    shareManager.postupgrade();
+    nftManager.postupgrade();
+    galleryManager.postupgrade();
   };
 }
