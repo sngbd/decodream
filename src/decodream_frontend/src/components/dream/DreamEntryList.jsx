@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useDreams } from "../../context/DreamContext";
 import Loading from "../common/Loading";
 import "../styles/DreamEntryList.scss";
+import { decodream_backend as ded } from "../../../../declarations/decodream_backend";
 
 const DreamEntryList = ({ onWriteDreamClick }) => {
   const { isLoggedIn } = useAuth();
@@ -12,13 +13,73 @@ const DreamEntryList = ({ onWriteDreamClick }) => {
   const [sortOrder, setSortOrder] = useState("newest");
   const [filterType, setFilterType] = useState("all");
   const [animateEntries, setAnimateEntries] = useState(false);
+  const [dreamStatuses, setDreamStatuses] = useState({});
+  const [_statusLoading, setStatusLoading] = useState(false);
   const listRef = useRef(null);
 
-  // Handle entry animations
   useEffect(() => {
     if (!loading && dreamEntries.length > 0) {
       setAnimateEntries(true);
     }
+  }, [loading, dreamEntries]);
+
+  useEffect(() => {
+    const fetchStatuses = async () => {
+      if (!loading && dreamEntries.length > 0) {
+        setStatusLoading(true);
+        try {
+          const statuses = {};
+          
+          for (let i = 0; i < dreamEntries.length; i += 10) {
+            const batch = dreamEntries.slice(i, i + 10);
+            
+            const batchPromises = batch.map(async (entry) => {
+              const timestamp = typeof entry.timestamp === 'bigint' 
+                ? entry.timestamp 
+                : BigInt(entry.timestamp);
+                
+              try {
+                const [isShared, isMinted] = await Promise.all([
+                  ded.isDreamShared(entry.user, timestamp),
+                  ded.isDreamMinted(entry.user, timestamp)
+                ]);
+                
+                return {
+                  id: entry.timestamp.toString(),
+                  isShared,
+                  isMinted
+                };
+              } catch (error) {
+                console.error("Error checking status for entry:", error);
+                return {
+                  id: entry.timestamp.toString(),
+                  isShared: false,
+                  isMinted: false
+                };
+              }
+            });
+            
+            const batchResults = await Promise.all(batchPromises);
+            
+            batchResults.forEach(result => {
+              statuses[result.id] = {
+                isShared: result.isShared,
+                isMinted: result.isMinted
+              };
+            });
+          }
+          
+          setDreamStatuses(statuses);
+        } catch (error) {
+          console.error("Error fetching dream statuses:", error);
+        } finally {
+          setStatusLoading(false);
+          setAnimateEntries(true);
+        }
+      }
+    };
+
+    fetchStatuses();
   }, [loading, dreamEntries]);
 
   if (!isLoggedIn) {
@@ -28,29 +89,27 @@ const DreamEntryList = ({ onWriteDreamClick }) => {
   const entriesCount = dreamEntries.length;
   const isSearching = Boolean(searchQuery);
 
-  // Sort entries based on user preference
-// Replace your sort function with this:
-
-const sortedEntries = [...dreamEntries].sort((a, b) => {
-  // Convert BigInt to string first to avoid type issues
-  const aTime = typeof a.timestamp === 'bigint' ? a.timestamp.toString() : a.timestamp;
-  const bTime = typeof b.timestamp === 'bigint' ? b.timestamp.toString() : b.timestamp;
-  
-  // Parse as numbers for comparison
-  const aNum = Number(aTime);
-  const bNum = Number(bTime);
-  
-  if (sortOrder === "newest") {
-    return bNum - aNum;
-  } else {
-    return aNum - bNum;
-  }
-});
+  const sortedEntries = [...dreamEntries].sort((a, b) => {
+    const aTime = typeof a.timestamp === 'bigint' ? a.timestamp.toString() : a.timestamp;
+    const bTime = typeof b.timestamp === 'bigint' ? b.timestamp.toString() : b.timestamp;
+    
+    const aNum = Number(aTime);
+    const bNum = Number(bTime);
+    
+    if (sortOrder === "newest") {
+      return bNum - aNum;
+    } else {
+      return aNum - bNum;
+    }
+  });
 
   const filteredEntries = sortedEntries.filter(entry => {
+    const entryId = entry.timestamp.toString();
+    const status = dreamStatuses[entryId] || { isShared: false, isMinted: false };
+    
     if (filterType === "all") return true;
-    if (filterType === "shared" && entry.isShared) return true;
-    if (filterType === "minted" && entry.isNFT) return true;
+    if (filterType === "shared" && status.isShared) return true;
+    if (filterType === "minted" && status.isMinted) return true;
     return false;
   });
 
@@ -66,6 +125,15 @@ const sortedEntries = [...dreamEntries].sort((a, b) => {
     groups[groupKey].push(entry);
     return groups;
   }, {});
+
+  const dreamCounts = dreamEntries.reduce((counts, entry) => {
+    const entryId = entry.timestamp.toString();
+    const status = dreamStatuses[entryId] || { isShared: false, isMinted: false };
+    
+    if (status.isShared) counts.shared++;
+    if (status.isMinted) counts.minted++;
+    return counts;
+  }, { shared: 0, minted: 0 });
 
   return (
     <section className="entries-container" aria-labelledby="entries-heading">
@@ -85,19 +153,29 @@ const sortedEntries = [...dreamEntries].sort((a, b) => {
                 <option value="newest">Newest First</option>
                 <option value="oldest">Oldest First</option>
               </select>
-              <i className="fas fa-sort"></i>
+              <i className="fas fa-sort-down"></i>
             </div>
-            <div className="filter-control">
-              <select 
-                value={filterType} 
-                onChange={(e) => setFilterType(e.target.value)}
-                aria-label="Filter dreams"
+            <div className="filter-tabs">
+              <button 
+                className={`filter-tab ${filterType === "all" ? "active" : ""}`}
+                onClick={() => setFilterType("all")}
               >
-                <option value="all">All Dreams</option>
-                <option value="shared">Shared</option>
-                <option value="minted">NFT Minted</option>
-              </select>
-              <i className="fas fa-filter"></i>
+                All Dreams <span className="count">{dreamEntries.length}</span>
+              </button>
+              <button 
+                className={`filter-tab ${filterType === "shared" ? "active" : ""}`}
+                onClick={() => setFilterType("shared")}
+                disabled={dreamCounts.shared === 0}
+              >
+                Shared <span className="count">{dreamCounts.shared}</span>
+              </button>
+              <button 
+                className={`filter-tab ${filterType === "minted" ? "active" : ""}`}
+                onClick={() => setFilterType("minted")}
+                disabled={dreamCounts.minted === 0}
+              >
+                NFT <span className="count">{dreamCounts.minted}</span>
+              </button>
             </div>
           </div>
         </div>
@@ -149,15 +227,25 @@ const sortedEntries = [...dreamEntries].sort((a, b) => {
                   <span className="entry-count">{entries.length} dream{entries.length !== 1 ? 's' : ''}</span>
                 </div>
                 <ul className={`entry-items ${animateEntries ? 'animate' : ''}`}>
-                  {entries.map((entry, index) => (
-                    <li 
-                      key={entry.id || entry.timestamp} 
-                      className="entry-item-wrapper"
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                    >
-                      <DreamEntryItem entry={entry} />
-                    </li>
-                  ))}
+                  {entries.map((entry, index) => {
+                    const entryId = entry.timestamp.toString();
+                    const status = dreamStatuses[entryId] || { isShared: false, isMinted: false };
+                    const enhancedEntry = {
+                      ...entry,
+                      isShared: status.isShared,
+                      isNFT: status.isMinted
+                    };
+                    
+                    return (
+                      <li 
+                        key={entry.id || entry.timestamp} 
+                        className="entry-item-wrapper"
+                        style={{ animationDelay: `${index * 0.1}s` }}
+                      >
+                        <DreamEntryItem entry={enhancedEntry} />
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))

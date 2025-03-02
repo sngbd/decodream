@@ -1,69 +1,183 @@
 @import '../../variables';
 
-.confirm-dialog {
+.confirm-dialog-backdrop {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(15, 5, 36, 0.8);
-  backdrop-filter: blur(5px);
   z-index: 1000;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease;
+}
+
+.confirm-dialog {
+  width: 90%;
+  max-width: 450px;
+  background: $dream-panel;
+  border: 1px solid $dream-panel-border;
+  box-shadow: $panel-glow;
+  border-radius: 10px;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
   
-  .dialog-content {
-    @include dream-panel;
-    width: 400px;
-    max-width: 90%;
-    padding: 25px;
-    animation: fadeInUp 0.3s forwards;
+  &.warning {
+    border-color: rgba(255, 193, 7, 0.6);
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.3);
     
     h3 {
-      margin-top: 0;
-      text-align: center;
-    }
-    
-    p {
-      text-align: center;
-      margin-bottom: 25px;
-    }
-    
-    .dialog-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      
-      button {
-        min-width: 120px;
-      }
-      
-      .confirm-button {
-        @include dream-button;
-        background: linear-gradient(135deg, darken($dream-danger, 20%), $dream-danger);
-        border-color: $dream-danger;
-        
-        &:hover {
-          background: linear-gradient(135deg, $dream-danger, lighten($dream-danger, 10%));
-        }
-      }
-      
-      .cancel-button {
-        @include dream-button;
-        background: linear-gradient(135deg, darken($dream-secondary, 10%), $dream-secondary);
+      color: #ffd54f;
+      i {
+        color: #ffc107;
       }
     }
   }
   
-  @keyframes fadeInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
+  &.danger {
+    border-color: rgba(220, 53, 69, 0.6);
+    box-shadow: 0 0 15px rgba(220, 53, 69, 0.3);
+    
+    h3 {
+      color: #ff6b6b;
+      i {
+        color: #dc3545;
+      }
     }
-    to {
-      opacity: 1;
-      transform: translateY(0);
+  }
+  
+  .dialog-content {
+    padding: 20px;
+    
+    h3 {
+      margin: 0 0 15px;
+      color: $dream-accent;
+      font-size: 1.3rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      
+      i {
+        margin-right: 10px;
+        font-size: 1.4rem;
+      }
+    }
+    
+    .message-content {
+      color: $dream-text-primary;
+      margin-bottom: 25px;
+      font-size: 1rem;
+      line-height: 1.5;
+      
+      p {
+        margin: 0 0 10px;
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+    
+    .dialog-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+      
+      button {
+        min-width: 100px;
+        padding: 10px 18px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        
+        i {
+          font-size: 0.9rem;
+        }
+        
+        &:hover {
+          transform: translateY(-2px);
+        }
+        
+        &:active {
+          transform: translateY(1px);
+        }
+      }
+      
+      .cancel-button {
+        background: rgba(60, 60, 70, 0.8);
+        border: 1px solid rgba(80, 80, 90, 0.6);
+        color: $dream-text-primary;
+        
+        &:hover {
+          background: rgba(70, 70, 80, 0.9);
+        }
+      }
+      
+      .confirm-button {
+        background: rgba(42, 82, 190, 0.8);
+        border: 1px solid rgba(66, 126, 235, 0.6);
+        color: white;
+        
+        &:hover {
+          background: rgba(50, 100, 230, 0.9);
+        }
+        
+        &.delete-button {
+          background: rgba(180, 30, 40, 0.8);
+          border: 1px solid rgba(210, 50, 60, 0.6);
+          
+          &:hover {
+            background: rgba(200, 40, 50, 0.9);
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@media (max-width: $breakpoint-mobile) {
+  .confirm-dialog {
+    width: 95%;
+    
+    .dialog-content {
+      padding: 15px;
+      
+      h3 {
+        font-size: 1.2rem;
+      }
+      
+      .dialog-buttons {
+        flex-direction: column;
+        
+        button {
+          width: 100%;
+        }
+        
+        .cancel-button {
+          order: 2;
+        }
+        
+        .confirm-button {
+          order: 1;
+        }
+      }
     }
   }
 }

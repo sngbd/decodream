@@ -122,8 +122,8 @@
         display: flex;
         justify-content: space-between;
         margin-top: 10px;
-        gap: 15px; // Reduced from 20px
-        margin-bottom: 5px; // Add a small bottom margin
+        gap: 15px;
+        margin-bottom: 5px;
 
         
         .primary-actions, .management-actions {
@@ -170,7 +170,6 @@
             font-size: 1rem;
           }
           
-          // Share button
           &.share-button {
             background-color: rgba(42, 82, 190, 0.8);
             border: 1px solid rgba(66, 126, 235, 0.6);
@@ -185,9 +184,8 @@
             }
           }
           
-          // Mint button
           &.mint-button {
-            background-color: rgba(138, 43, 226, 0.8); // Using dream-accent color base
+            background-color: rgba(138, 43, 226, 0.8);
             border: 1px solid rgba(158, 63, 246, 0.6);
             
             i {
@@ -200,7 +198,6 @@
             }
           }
           
-          // Edit button
           &.edit-button {
             background-color: rgba(23, 95, 170, 0.8);
             border: 1px solid rgba(43, 125, 210, 0.6);
@@ -215,7 +212,6 @@
             }
           }
           
-          // Delete button
           &.delete-button {
             background-color: rgba(180, 30, 40, 0.8);
             border: 1px solid rgba(210, 50, 60, 0.6);
@@ -284,21 +280,20 @@
               overflow: hidden;
               box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
               transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-              margin: 0 auto 15px; // Centered
-              border: 1px solid rgba($dream-accent, 0.2);
+              margin: 0 auto 15px;
+              border: 1px solid rgka($dream-accent, 0.2);
               
               .dream-image {
                 display: block;
                 width: 100%;
-                max-height: 400px; // Added max height constraint
-                object-fit: contain; // Maintain aspect ratio
+                max-height: 400px;
+                object-fit: contain;
                 transition: all 0.3s ease;
                 cursor: pointer;
               }
             }
           }
 
-            // Improve the analysis content markdown styling
           .analysis-content {
             color: $dream-text-primary;
             line-height: 1.7;
@@ -388,30 +383,28 @@
             }
           }
 
-          // Improve image modal
           .image-modal-backdrop {
             .image-modal {
               position: relative;
-              max-width: 90%; // Slightly reduced
+              max-width: 90%;
               max-height: 90vh;
               
               .modal-image {
                 max-width: 100%;
-                max-height: 80vh; // Reduced max height
-                object-fit: contain; // This ensures the image maintains its aspect ratio
+                max-height: 80vh;
+                object-fit: contain;
                 background: #050212;
                 border-radius: 8px;
-                display: block; // Ensures no extra space
+                display: block;
               }
               
-              // Better positioned close button
               .close-modal {
                 position: absolute;
                 top: 15px;
                 right: 15px;
                 background: rgba(10, 3, 24, 0.8);
                 border: 1px solid rgba($dream-accent, 0.3);
-                width: 40px; // Larger clickable area
+                width: 40px;
                 height: 40px;
                 border-radius: 50%;
                 display: flex;
@@ -422,7 +415,7 @@
                 z-index: 10;
                 
                 i {
-                  font-size: 1.1rem; // Larger icon
+                  font-size: 1.1rem;
                 }
                 
                 &:hover {
@@ -446,7 +439,6 @@
 
 }
 
-// Notification panels
 .notification-panel {
   margin-top: 10px;
   padding: 12px 15px;
@@ -554,7 +546,6 @@
   }
 }
 
-// Image modal
 .image-modal-backdrop {
   position: fixed;
   top: 0;
@@ -607,7 +598,6 @@
   }
 }
 
-// Animations
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -628,7 +618,6 @@
   to { opacity: 0; }
 }
 
-// Responsive adjustments
 @media (max-width: 767px) {
   .entry-footer .action-buttons {
     flex-direction: column;
@@ -638,14 +627,73 @@
       justify-content: space-between;
       
       .dream-button {
-        flex: 1; // Make buttons take equal width on mobile
-        min-width: 0; // Allow buttons to shrink if needed
-        padding: 12px 10px; // Adjust padding for mobile
+        flex: 1;
+        min-width: 0;
+        padding: 12px 10px;
       }
     }
   }
   
   .visualization-section .dream-image-container .dream-image {
     max-height: 300px;
+  }
+}
+
+.unshare-button {
+  background-color: rgba(90, 90, 90, 0.8) !important;
+  border: 1px solid rgba(120, 120, 120, 0.6) !important;
+  
+  i {
+    color: #e0e0e0 !important;
+  }
+  
+  &:hover:not(:disabled) {
+    background-color: rgba(110, 110, 110, 0.9) !important;
+    border-color: rgba(150, 150, 150, 0.8) !important;
+  }
+}
+
+.burn-button {
+  background-color: rgba(185, 65, 10, 0.8) !important;
+  border: 1px solid rgba(215, 90, 30, 0.6) !important;
+  
+  i {
+    color: #ffaa80 !important;
+  }
+  
+  &:hover:not(:disabled) {
+    background-color: rgba(210, 75, 15, 0.9) !important;
+    border-color: rgba(240, 100, 35, 0.8) !important;
+  }
+}
+
+.dream-entry-item.is-minted {
+  border-left: 3px solid #ffcb2c;
+  
+  .entry-header {
+    .entry-title {
+      padding-left: 5px;
+      
+      &:after {
+        content: "\f023";
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        margin-left: 8px;
+        font-size: 0.8em;
+        color: rgba(255, 200, 50, 0.7);
+        vertical-align: middle;
+      }
+    }
+  }
+  
+  .edit-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    position: relative;
+    
+    &:hover {
+      background-color: rgba(23, 95, 170, 0.8) !important;
+      transform: none !important;
+    }
   }
 }

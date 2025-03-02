@@ -4,12 +4,15 @@ import { useAuth } from "../../context/AuthContext";
 import { useDreams } from "../../context/DreamContext";
 import ErrorMessage from "../common/ErrorMessage";
 import "../styles/DreamForm.scss";
+import ConfirmDialog from "../common/ConfirmDialog";
 
 const DreamForm = ({ onAnalysisComplete }) => {
   const [dreamInput, setDreamInput] = useState("");
   const [charCount, setCharCount] = useState(0);
-  const [formState, setFormState] = useState("idle"); // idle, typing, analyzing, complete
+  const [formState, setFormState] = useState("idle");
   const [saveStatus, setSaveStatus] = useState(null);
+  const [showConfirmClear, setShowConfirmClear] = useState(false);
+  const [isClearing, setIsClearing] = useState(false);
   const dreamTextareaRef = useRef(null);
   const autoSaveTimerRef = useRef(null);
   
@@ -36,7 +39,6 @@ const DreamForm = ({ onAnalysisComplete }) => {
     setIsAnalyzed,
   } = useDreams();
 
-  // Set initial state and handle editing mode
   useEffect(() => {
     if (editingEntry && currentDream) {
       setDreamInput(currentDream);
@@ -49,16 +51,13 @@ const DreamForm = ({ onAnalysisComplete }) => {
     }
   }, [editingEntry, currentDream]);
 
-  // Auto-save draft functionality for logged-in users
   useEffect(() => {
     if (!isLoggedIn || !dreamInput.trim() || editingEntry) return;
     
-    // Clear previous timer
     if (autoSaveTimerRef.current) {
       clearTimeout(autoSaveTimerRef.current);
     }
     
-    // Set new timer for auto-saving
     if (dreamInput.length > 20) {
       autoSaveTimerRef.current = setTimeout(() => {
         localStorage.setItem('dreamDraft', dreamInput);
@@ -74,7 +73,6 @@ const DreamForm = ({ onAnalysisComplete }) => {
     };
   }, [dreamInput, isLoggedIn, editingEntry]);
 
-  // Load saved draft on initial render for logged-in users
   useEffect(() => {
     if (isLoggedIn && !editingEntry && !dreamInput) {
       const savedDraft = localStorage.getItem('dreamDraft');
@@ -86,18 +84,15 @@ const DreamForm = ({ onAnalysisComplete }) => {
     }
   }, [isLoggedIn]);
   
-  // Update char count and form state when input changes
   const handleInputChange = (e) => {
     const value = e.target.value;
     setDreamInput(value);
     setCharCount(value.length);
     setFormState(value.trim().length > 0 ? "typing" : "idle");
     
-    // Clear error when typing
     if (error) setError("");
   };
   
-  // Handle form submission and dream analysis
   const analyzeDream = async () => {
     if (!isLoggedIn && anonymousAnalysisDone) {
       setError("Please login to analyze more dreams.");
@@ -116,7 +111,6 @@ const DreamForm = ({ onAnalysisComplete }) => {
     setFormState("analyzing");
 
     try {
-      // Dream analysis API call
       const response = await axios.post(
         "https://openrouter.ai/api/v1/chat/completions",
         {
@@ -136,7 +130,6 @@ const DreamForm = ({ onAnalysisComplete }) => {
         }
       );
 
-      // Image generation API call
       const responseImage = await axios.post(
         `${import.meta.env.VITE_WORKERS_AI || 'http://localhost:3000'}/generate`,
         {
@@ -168,39 +161,32 @@ const DreamForm = ({ onAnalysisComplete }) => {
       } else if (editingEntry) {
         await updateDreamEntry(dreamInput, analysisContent, responseImage.data.image);
         resetEditingState();
-        // Clear the input only after successful save
         setDreamInput("");
         setCharCount(0);
-        // Clear draft if we were editing
         localStorage.removeItem('dreamDraft');
       } else {
         await addDreamEntry(dreamInput, analysisContent, responseImage.data.image);
-        // Clear the input only after successful save
         setDreamInput("");
         setCharCount(0);
-        // Clear draft after successful save
         localStorage.removeItem('dreamDraft');
       }
       
-      // Mark analysis as complete and transition to complete state
       setFormState("complete");
       setIsAnalyzed(true);
       
-      // If there's a callback for analysis completion, call it
       if (onAnalysisComplete && typeof onAnalysisComplete === 'function') {
-        setTimeout(onAnalysisComplete, 500); // Small delay for smoother transition
+        setTimeout(onAnalysisComplete, 500);
       }
       
     } catch (error) {
       setError("Failed to analyze the dream. Please try again.");
       console.error("Error analyzing dream:", error);
-      setFormState("typing"); // Go back to typing state on error
+      setFormState("typing");
     } finally {
       setIsAnalyzing(false);
     }
   };
 
-  // Keyboard shortcut for submitting
   const handleKeyDown = (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();
@@ -208,20 +194,30 @@ const DreamForm = ({ onAnalysisComplete }) => {
     }
   };
   
-  // Clear form and reset state
   const handleClearForm = () => {
     if (dreamInput.trim() && !isAnalyzing) {
-      if (confirm("Are you sure you want to clear your dream description?")) {
-        setDreamInput("");
-        setCharCount(0);
-        setFormState("idle");
-        localStorage.removeItem('dreamDraft');
-        setError("");
-      }
+      setShowConfirmClear(true);
     }
   };
 
-  // Get guidance quality indicator based on input length
+  const confirmClear = () => {
+    setIsClearing(true);
+    
+    setTimeout(() => {
+      setDreamInput("");
+      setCharCount(0);
+      setFormState("idle");
+      localStorage.removeItem('dreamDraft');
+      setError("");
+      setIsClearing(false);
+      setShowConfirmClear(false);
+    }, 500);
+  };
+
+  const cancelClear = () => {
+    setShowConfirmClear(false);
+  };
+
   const getDreamQuality = () => {
     if (charCount === 0) return { class: '', text: '' };
     if (charCount < 50) return { class: 'poor', text: 'Too brief for quality analysis' };
@@ -304,11 +300,19 @@ const DreamForm = ({ onAnalysisComplete }) => {
               disabled={isAnalyzing || !dreamInput.trim()}
               aria-label="Clear dream description"
             >
-              <i className="fas fa-times"></i>
-              <span>Clear</span>
+              {isClearing ? (
+                <>
+                  <div className="spinner small"></div>
+                  <span>Clearing...</span>
+                </>
+              ) : (
+                <>
+                  <i className="fas fa-times"></i>
+                  <span>Clear</span>
+                </>
+              )}
             </button>
           )}
-          
           <button
             type="button"
             onClick={analyzeDream}
@@ -364,6 +368,17 @@ const DreamForm = ({ onAnalysisComplete }) => {
           </div>
         </div>
       )}
+
+      {
+        showConfirmClear &&
+        <ConfirmDialog 
+          title="Clear Dream Text"
+          message="Are you sure you want to clear your dream description? This action cannot be undone."
+          confirmText={isClearing ? "Clearing..." : "Yes, Clear It"}
+          onConfirm={confirmClear}
+          onCancel={cancelClear}
+        />
+      }  
     </section>
   );
 };

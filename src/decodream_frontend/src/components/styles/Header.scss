@@ -373,7 +373,6 @@
     }
   }
   
-  // Animations
   @keyframes pulse {
     0% {
       opacity: 0.6;
@@ -395,7 +394,6 @@
     }
   }
   
-  // Responsive styles
   @media (max-width: 768px) {
     .mobile-menu-toggle {
       display: block;

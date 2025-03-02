@@ -5,7 +5,6 @@
   flex-direction: column;
   min-height: 90vh;
   
-  // Navigation section with tabs
   .dreams-navigation {
     margin-bottom: 25px;
     
@@ -134,7 +133,6 @@
       }
     }
     
-    // Progress indicator
     .progress-indicator {
       display: flex;
       align-items: center;
@@ -207,7 +205,6 @@
     }
   }
   
-  // Content panels
   .dreams-content {
     position: relative;
     
@@ -225,7 +222,6 @@
       }
     }
     
-    // Write panel extras
     .hint-panel {
       @include dream-panel;
       padding: 25px;
@@ -301,7 +297,6 @@
       }
     }
     
-    // Analysis panel extras
     .action-panel {
       text-align: center;
       margin-top: 30px;
@@ -348,7 +343,6 @@
   }
 }
 
-// Animations
 @keyframes pulse {
   0% {
     transform: scale(1);
@@ -380,7 +374,6 @@
   }
 }
 
-// Responsive styling
 @media (max-width: 768px) {
   .dreams-page {
     .dreams-navigation {

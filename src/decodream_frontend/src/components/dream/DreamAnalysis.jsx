@@ -14,12 +14,11 @@ const DreamAnalysis = () => {
     currentDream, 
     currentAnalysis, 
     currentEntryTimestamp, 
-    lastUpdated,
+    updated,
     currentImage,
     isAnalyzing,
   } = useDreams();
 
-  // Auto-scroll to analysis when analysis is complete
   useEffect(() => {
     if (!isAnalyzing && currentAnalysis && analysisRef.current && activeTab === "analysis") {
       setTimeout(() => {
@@ -28,7 +27,6 @@ const DreamAnalysis = () => {
     }
   }, [isAnalyzing, currentAnalysis, activeTab]);
 
-  // Toggle insights with animation
   useEffect(() => {
     if (showInsights) {
       setTimeout(() => {
@@ -59,34 +57,28 @@ const DreamAnalysis = () => {
     });
   };
 
-  // Calculate approximate read time for the dream
   const getReadTime = () => {
     if (!currentDream) return "< 1 min";
     const words = currentDream.trim().split(/\s+/).length;
-    const minutes = Math.ceil(words / 200); // Average reading speed
+    const minutes = Math.ceil(words / 200);
     return `${minutes} min read`;
   };
 
-  // Extract key themes from analysis for quick insights
   const extractInsights = () => {
     if (!currentAnalysis) return [];
 
-    // Look for common Markdown headers that might contain insights
     const insightKeywords = [
       'symbol', 'theme', 'emotion', 'interpretation', 
       'meaning', 'key element', 'significant', 'represent'
     ];
     
-    // Split by line and find potential insights
     const lines = currentAnalysis.split('\n');
     const insights = [];
     
     lines.forEach(line => {
       const lowerLine = line.toLowerCase();
-      // Look for bullet points with insight keywords
       if (line.includes('- ') || line.includes('* ')) {
         if (insightKeywords.some(keyword => lowerLine.includes(keyword))) {
-          // Extract the insight text, removing markdown symbols
           const cleanText = line.replace(/^[-*]\s+/, '').trim();
           if (cleanText.length > 10 && cleanText.length < 120) {
             insights.push(cleanText);
@@ -95,18 +87,16 @@ const DreamAnalysis = () => {
       }
     });
     
-    // Return up to 3 most relevant insights
     return insights.slice(0, 3);
   };
 
   const createdDate = formatDate(currentEntryTimestamp);
-  const updatedDate = formatDate(lastUpdated);
+  const updatedDate = formatDate(updated);
   const readTime = getReadTime();
   const insights = extractInsights();
 
   return (
     <div className="dream-analysis" aria-labelledby="analysis-title">
-      {/* Loading state */}
       {isAnalyzing && (
         <div className="analysis-loading">
           <div className="spinner-container">
@@ -120,7 +110,6 @@ const DreamAnalysis = () => {
         </div>
       )}
 
-      {/* Analysis Content */}
       {!isAnalyzing && currentAnalysis && (
         <>
           <div className="analysis-header">
@@ -248,10 +237,10 @@ const DreamAnalysis = () => {
           
           <div className="analysis-footer">
             <div className="timestamp-info" aria-live="polite">
-              {updatedDate && lastUpdated !== currentEntryTimestamp && (
+              {updatedDate && updated !== currentEntryTimestamp && (
                 <p className="updated-timestamp">
                   <i className="fas fa-edit"></i>
-                  <time dateTime={new Date(Number(lastUpdated)).toISOString()}>
+                  <time dateTime={new Date(Number(updated)).toISOString()}>
                     Last updated: {updatedDate}
                   </time>
                 </p>

@@ -2,16 +2,20 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { decodream_backend as ded } from "../../../declarations/decodream_backend";
 import { useAuth } from "./AuthContext";
 
-const DreamContext = createContext(null);
+const DreamContext = createContext({
+  activeTab: 'history',
+  setActiveTab: () => {},
+});
 
 export const DreamProvider = ({ children }) => {
   const { isLoggedIn, getPrincipal } = useAuth();
+  const [activeTab, setActiveTab] = useState('write');
   const [dreamEntries, setDreamEntries] = useState([]);
   const [currentDream, setCurrentDream] = useState("");
   const [currentAnalysis, setCurrentAnalysis] = useState("");
   const [editingEntry, setEditingEntry] = useState(null);
   const [currentEntryTimestamp, setCurrentEntryTimestamp] = useState(null);
-  const [lastUpdated, setLastUpdated] = useState(null);
+  const [updated, setLastUpdated] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
@@ -64,7 +68,8 @@ export const DreamProvider = ({ children }) => {
         analysis,
         timestamp,
         user: getPrincipal(),
-        lastUpdated: timestamp,
+        created: timestamp,
+        updated: timestamp,
         imageData
       });
       
@@ -126,11 +131,14 @@ export const DreamProvider = ({ children }) => {
     setCurrentAnalysis(entry.analysis);
     setEditingEntry(entry);
     setCurrentEntryTimestamp(entry.timestamp);
-    setLastUpdated(entry.lastUpdated ? Number(entry.lastUpdated) : null);
+    setLastUpdated(entry.updated ? Number(entry.updated) : null);
     setCurrentImage(entry.imageData);
   };
 
   const resetCurrentDream = () => {
+    setActiveTab('write');
+    setIsAnalyzing(false);
+    setIsAnalyzed(false);
     setCurrentDream("");
     setCurrentAnalysis("");
     setCurrentImage('');
@@ -149,6 +157,8 @@ export const DreamProvider = ({ children }) => {
 
   const value = {
     dreamEntries: filteredEntries,
+    activeTab,
+    setActiveTab,
     currentDream,
     setCurrentDream,
     resetEditingState,
@@ -156,7 +166,7 @@ export const DreamProvider = ({ children }) => {
     setCurrentAnalysis,
     editingEntry,
     currentEntryTimestamp,
-    lastUpdated,
+    updated,
     loading,
     error,
     setError,

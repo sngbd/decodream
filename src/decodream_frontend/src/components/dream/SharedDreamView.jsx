@@ -36,15 +36,71 @@ const SharedDreamView = () => {
   const formatDate = (timestamp) => {
     if (!timestamp) return '';
     
-    const date = new Date(Number(timestamp));
+    try {
+      let dateValue;
+      if (typeof timestamp === 'bigint') {
+        dateValue = Number(timestamp);
+      } else if (typeof timestamp === 'string') {
+        dateValue = parseInt(timestamp, 10);
+      } else {
+        dateValue = Number(timestamp);
+      }
+      
+      if (dateValue > 1e15) {
+        dateValue = dateValue / 1000000;
+      } else if (dateValue < 1e10) {
+        dateValue = dateValue * 1000;
+      }
+      
+      const date = new Date(dateValue);
+      
+      if (isNaN(date.getTime())) {
+        return 'Invalid date';
+      }
+      
+      return date.toLocaleString(undefined, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (e) {
+      console.error('Error formatting date:', e);
+      return 'Invalid date format';
+    }
+  };
+
+  const safeISOString = (timestamp) => {
+    if (!timestamp) return '';
     
-    return date.toLocaleString(undefined, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    try {
+      let dateValue;
+      if (typeof timestamp === 'bigint') {
+        dateValue = Number(timestamp);
+      } else if (typeof timestamp === 'string') {
+        dateValue = parseInt(timestamp, 10);
+      } else {
+        dateValue = Number(timestamp);
+      }
+      
+      if (dateValue > 1e15) {
+        dateValue = dateValue / 1000000;
+      } else if (dateValue < 1e10) {
+        dateValue = dateValue * 1000;
+      }
+      
+      const date = new Date(dateValue);
+      
+      if (isNaN(date.getTime())) {
+        return '';
+      }
+      
+      return date.toISOString();
+    } catch (e) {
+      console.error('Error formatting ISO date:', e);
+      return '';
+    }
   };
 
   if (loading) {
@@ -82,14 +138,14 @@ const SharedDreamView = () => {
         <h2>Shared Dream</h2>
         <div className="timestamp-info">
           <p>
-            <time dateTime={new Date(Number(dream.timestamp)).toISOString()}>
-              <strong>Created:</strong> {formatDate(dream.timestamp)}
+            <time dateTime={safeISOString(dream.created)}>
+              <strong>Created:</strong> {formatDate(dream.created)}
             </time>
           </p>
-          {Number(dream.lastUpdated) !== Number(dream.timestamp) && (
+          {dream.updated && dream.created && Number(dream.updated) !== Number(dream.created) && (
             <p>
-              <time dateTime={new Date(Number(dream.lastUpdated)).toISOString()}>
-                <strong>Updated:</strong> {formatDate(dream.lastUpdated)}
+              <time dateTime={safeISOString(dream.updated)}>
+                <strong>Updated:</strong> {formatDate(dream.updated)}
               </time>
             </p>
           )}

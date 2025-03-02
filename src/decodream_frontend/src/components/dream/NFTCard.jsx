@@ -4,34 +4,89 @@ import '../styles/NFTCard.scss';
 const NFTCard = ({ nft }) => {
   const [showDetails, setShowDetails] = useState(false);
 
-  const formatDate = (timestamp) => {
-    if (!timestamp) return '';
-    
-    const date = new Date(Number(timestamp));
-    
-    if (isNaN(date.getTime())) return '';
-    
-    return date.toLocaleString(undefined, {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
-
-  const findAttribute = (name) => {
-    const attribute = nft.metadata.attributes.find(attr => attr[0] === name);
-    if (attribute) {
-      if ('int' in attribute[1]) return attribute[1].int;
-      if ('text' in attribute[1]) return attribute[1].text;
-      if ('nat' in attribute[1]) return attribute[1].nat;
+  const extractTokenId = () => {
+    if (!nft || !nft.metadata || !nft.metadata.name) {
+      return nft?.tokenId || '?';
     }
-    return null;
+    
+    const match = nft.metadata.name.match(/#(\d+)/);
+    if (match && match[1]) {
+      return match[1];
+    }
+    
+    return nft.tokenId || '?';
   };
 
-  const dreamText = findAttribute('dreamText');
-  const mintedDate = formatDate(nft.minted);
+  const tokenId = extractTokenId();
+
+  const formatDate = (timestamp) => {
+    let timeValue;
+    
+    if (typeof timestamp === 'bigint') {
+      timeValue = Number(timestamp) / 1000000;
+    } else if (typeof timestamp === 'object' && 'int' in timestamp) {
+      timeValue = Number(timestamp.int) / 1000000;
+    } else {
+      timeValue = Number(timestamp) / 1000000;
+    }
+    
+    try {
+      const date = new Date(timeValue);
+      
+      if (isNaN(date.getTime())) {
+        return 'Invalid date';
+      }
+      
+      return date.toLocaleString(undefined, {
+        year: 'numeric',
+        month: 'short', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (e) {
+      console.error("Error formatting date:", e);
+      return 'Date error';
+    }
+  };
+
+  const extractAttributeValue = (attribute) => {
+    if (!attribute) return "";
+    
+    if (typeof attribute === "string" || typeof attribute === "number") {
+      return attribute;
+    }
+    
+    if (typeof attribute === "object") {
+      if ('int' in attribute) return attribute.int.toString();
+      if ('text' in attribute) return attribute.text;
+      if ('nat' in attribute) return attribute.nat.toString();
+      if ('bool' in attribute) return attribute.bool.toString();
+    }
+    
+    return "";
+  };
+
+  const getDreamText = () => {
+    if (!nft?.metadata?.attributes || 
+        !Array.isArray(nft.metadata.attributes) || 
+        nft.metadata.attributes.length === 0) {
+      return "";
+    }
+    
+    const dreamAttribute = nft.metadata.attributes.find(
+      attr => Array.isArray(attr) && attr[0] === "dreamText"
+    ) || nft.metadata.attributes[0];
+    
+    if (Array.isArray(dreamAttribute) && dreamAttribute.length > 1) {
+      return extractAttributeValue(dreamAttribute[1]);
+    }
+    
+    return "";
+  };
+
+  const dreamText = getDreamText();
+  const mintedDate = nft?.minted ? formatDate(nft.minted) : "Date unavailable";
   
   const truncateDreamText = (text) => {
     if (!text) return '';
@@ -65,7 +120,7 @@ const NFTCard = ({ nft }) => {
       <div className="nft-image-container">
         {renderNFTImage()}
         <div className="nft-overlay">
-          <span className="nft-id">#{nft.tokenId}</span>
+          <span className="nft-id">#{tokenId}</span>
         </div>
       </div>
       
@@ -96,7 +151,7 @@ const NFTCard = ({ nft }) => {
             
             <div className="detail-item">
               <h4>Token ID:</h4>
-              <p>{nft.tokenId}</p>
+              <p>{tokenId}</p>
             </div>
           </div>
         )}

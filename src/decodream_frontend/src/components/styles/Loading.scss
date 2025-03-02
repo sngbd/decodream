@@ -1,26 +1,82 @@
 @import '../../variables';
 
-.loading-indicator {
-  text-align: center;
-  padding: 30px 0;
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   
-  .spinner {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    border: 3px solid rgba(218, 112, 214, 0.3);
-    border-radius: 50%;
-    border-top-color: $dream-accent;
-    animation: spin 1s ease-in-out infinite;
+  &.with-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    animation: fadeIn 0.2s ease;
   }
   
-  p {
-    margin-top: 15px;
-    color: $dream-text-secondary;
-    font-family: $font-secondary;
+  .loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 25px;
+    
+    .loading-spinner {
+      position: relative;
+      width: 70px;
+      height: 70px;
+      
+      .spinner-inner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 35px;
+        height: 35px;
+        border: 2px solid transparent;
+        border-top-color: $dream-accent;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      .spinner-outer {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border: 2px solid rgba($dream-accent, 0.3);
+        border-top-color: transparent;
+        border-radius: 50%;
+        animation: spin 1.5s cubic-bezier(0.5, 0.1, 0.5, 1) infinite;
+      }
+    }
+    
+    .loading-message {
+      color: $dream-text-primary;
+      margin-top: 20px;
+      font-size: 1rem;
+      font-weight: 500;
+      text-align: center;
+      animation: pulse 2s infinite;
+    }
   }
-  
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; text-shadow: none; }
+  50% { opacity: 1; text-shadow: $text-glow; }
+  100% { opacity: 0.6; text-shadow: none; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }

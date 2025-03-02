@@ -4,7 +4,6 @@
   @include dream-panel;
   padding: 25px;
   
-  // Loading Animation
   .analysis-loading {
     text-align: center;
     padding: 30px 0;
@@ -161,21 +160,142 @@
           font-size: 1.1rem;
           text-align: center;
         }
-        
-        ul {
-          padding-left: 20px;
+
+        .markdown-content {
+          color: $dream-text-primary;
+          line-height: 1.5;
+          font-size: 0.95rem;
           
-          li {
-            color: $dream-text-primary;
-            margin-bottom: 10px;
-            line-height: 1.4;
-            position: relative;
+          h1, h2, h3 {
+            color: $dream-accent;
+            margin: 0.8rem 0 0.5rem;
+            font-weight: 600;
+            font-size: 1rem;
             
-            &::marker {
+            &:first-child {
+              margin-top: 0;
+            }
+          }
+          
+          h2 {
+            font-size: 0.95rem;
+          }
+          
+          h3 {
+            font-size: 0.9rem;
+          }
+          
+          p {
+            margin-bottom: 0.8rem;
+            line-height: 1.5;
+            
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
+          
+          ul, ol {
+            padding-left: 15px;
+            margin: 8px 0;
+            
+            li {
+              margin-bottom: 6px;
+              font-size: 0.9rem;
+              line-height: 1.4;
+              
+              &:last-child {
+                margin-bottom: 0;
+              }
+              
+              &::marker {
+                color: $dream-accent;
+              }
+            }
+          }
+          
+          blockquote {
+            border-left: 2px solid $dream-accent;
+            padding-left: 10px;
+            margin: 10px 0;
+            color: rgba($dream-text-primary, 0.9);
+            font-style: italic;
+            font-size: 0.9rem;
+          }
+          
+          code {
+            background: rgba($dream-panel-border, 0.3);
+            padding: 1px 3px;
+            border-radius: 3px;
+            font-size: 0.85rem;
+            color: lighten($dream-text-primary, 5%);
+            font-family: $font-mono;
+          }
+          
+          strong {
+            color: lighten($dream-text-primary, 15%);
+            font-weight: 600;
+          }
+          
+          em {
+            color: rgba($dream-accent, 0.9);
+          }
+          
+          a {
+            color: $dream-accent;
+            text-decoration: none;
+            border-bottom: 1px dotted rgba($dream-accent, 0.5);
+            transition: all 0.2s ease;
+            
+            &:hover {
+              border-bottom-style: solid;
+            }
+          }
+          
+          table {
+            width: 100%;
+            margin: 10px 0;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            
+            th, td {
+              padding: 5px 8px;
+              border: 1px solid rgba($dream-panel-border, 0.4);
+            }
+            
+            th {
+              background: rgba($dream-panel-border, 0.2);
               color: $dream-accent;
             }
           }
+          
+          img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            margin: 8px 0;
+          }
         }
+  
+        ul {
+          li {
+            color: $dream-text-primary;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            
+            ul, ol {
+              margin-top: 6px;
+            }
+            
+            p {
+              margin-bottom: 6px;
+              
+              &:last-child {
+                margin-bottom: 0;
+              }
+            }
+          }
+        }
+        
       }
     }
   }
@@ -186,11 +306,11 @@
     border-bottom: 1px solid rgba($dream-accent, 0.2);
     gap: 5px;
     overflow-x: auto;
-    -ms-overflow-style: none; /* Hide scrollbar in IE and Edge */
-    scrollbar-width: none; /* Hide scrollbar in Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
     
     &::-webkit-scrollbar {
-      display: none; /* Hide scrollbar in Chrome/Safari */
+      display: none;
     }
     
     .analysis-tab {
@@ -252,9 +372,8 @@
         animation: fadeIn 0.5s ease;
       }
       
-      // Remove the top space from section titles
       .section-title {
-        margin-top: 0; // Add this to remove the top space
+        margin-top: 0;
         display: flex;
         align-items: center;
         gap: 10px;
@@ -289,19 +408,18 @@
       }
     }
     
-    // Fix dream content background
     .dream-content {
       .dream-text {
         color: $dream-text-primary;
         line-height: 1.6;
         font-size: 1.05rem;
-        background-color: transparent; // Ensure background is transparent
+        background-color: transparent;
         
         p {
           margin-bottom: 15px;
           
           &:first-child {
-            margin-top: 0; // Remove top margin from first paragraph
+            margin-top: 0;
           }
         }
       }
@@ -370,7 +488,7 @@
     .markdown-content {
       color: $dream-text-primary;
       line-height: 1.6;
-      background-color: transparent; // Ensure background is transparent
+      background-color: transparent;
       
       h1, h2, h3 {
         color: $dream-accent;
@@ -378,7 +496,7 @@
         font-weight: 600;
         
         &:first-child {
-          margin-top: 0; // Remove top margin from first heading
+          margin-top: 0;
         }
       }
       
@@ -462,7 +580,6 @@
   }
 }
 
-// Animations
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -501,7 +618,6 @@
   100% { margin-left: 100%; }
 }
 
-// Add print styles
 @media print {
   .dreams-navigation,
   .analysis-tabs,

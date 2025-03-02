@@ -7,6 +7,11 @@ import Header from "./Header";
 const LandingPage = () => {
   const { isLoggedIn, login, isAuthenticating } = useAuth();
 
+  const handleLogin = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    login();
+  };
+
   return (
     <>
       <div className="landing-page">
@@ -23,7 +28,7 @@ const LandingPage = () => {
                     </Link>
                   ) : (
                     <button 
-                      onClick={login} 
+                      onClick={handleLogin} 
                       disabled={isAuthenticating}
                       className="btn btn-primary"
                     >
@@ -197,7 +202,11 @@ const LandingPage = () => {
                     </li>
                     <li>
                       <i className="fas fa-check feature-icon"></i>
-                      Limited access to pattern recognition (last 30 days only)
+                      Sharing capability
+                    </li>
+                    <li>
+                      <i className="fas fa-check feature-icon"></i>
+                      Mint up to 50 NFTs
                     </li>
                     <li>
                       <i className="fas fa-check feature-icon"></i>
@@ -212,7 +221,7 @@ const LandingPage = () => {
                     </Link>
                   ) : (
                     <button
-                      onClick={login}
+                      onClick={handleLogin}
                       disabled={isAuthenticating}
                       className="btn btn-outline"
                     >
@@ -248,11 +257,15 @@ const LandingPage = () => {
                     </li>
                     <li>
                       <i className="fas fa-check feature-icon"></i>
-                      Export and sharing capabilities
+                      Export capability
                     </li>
                     <li>
                       <i className="fas fa-check feature-icon"></i>
                       Priority support
+                    </li>
+                    <li>
+                      <i className="fas fa-check feature-icon"></i>
+                      Unlimited NFT minting
                     </li>
                     <li>
                       <i className="fas fa-check feature-icon"></i>
@@ -267,7 +280,7 @@ const LandingPage = () => {
                     </Link>
                   ) : (
                     <button
-                      onClick={login}
+                      onClick={handleLogin}
                       disabled={isAuthenticating}
                       className="btn btn-primary"
                     >
@@ -325,7 +338,7 @@ const LandingPage = () => {
                     </Link>
                   ) : (
                     <button
-                      onClick={login}
+                      onClick={handleLogin}
                       disabled={isAuthenticating}
                       className="btn btn-outline"
                     >
@@ -349,7 +362,7 @@ const LandingPage = () => {
             <p>Join our community of dreamers and gain insights into your subconscious mind</p>
             {!isLoggedIn && (
               <button 
-                onClick={login} 
+                onClick={handleLogin} 
                 disabled={isAuthenticating}
                 className="btn btn-cta"
               >

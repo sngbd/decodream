@@ -10,7 +10,7 @@ const DreamEntryItem = ({ entry }) => {
   const [isExpanding, setIsExpanding] = useState(false);
   const [isCollapsing, setIsCollapsing] = useState(false);
   const [contentHeight, setContentHeight] = useState("0px");
-  const { selectDreamForEditing, setDreamToDelete, setIsAnalyzed } = useDreams();
+  const { selectDreamForEditing, setDreamToDelete, setIsAnalyzed, setActiveTab } = useDreams();
   const [isSharing, setIsSharing] = useState(false);
   const [shareLink, setShareLink] = useState('');
   const [shareError, setShareError] = useState('');
@@ -19,12 +19,164 @@ const DreamEntryItem = ({ entry }) => {
   const [mintError, setMintError] = useState('');
   const [clipboardStatus, setClipboardStatus] = useState('');
   const [imageZoomed, setImageZoomed] = useState(false);
+
+  const [isCurrentlyShared, setIsCurrentlyShared] = useState(false);
+  const [isMinted, setIsMinted] = useState(false);
+  const [isUnsharing, setIsUnsharing] = useState(false);
+  const [isBurning, setIsBurning] = useState(false);
   
   const contentRef = useRef(null);
   const notificationTimerRef = useRef(null);
   const entryRef = useRef(null);
 
-  // Improved smooth toggle with proper timings
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const timestampForShare = parseInt(entry.timestamp, 10);
+        const timestampForMint = parseInt(entry.timestamp, 10);
+        
+        const [isShared, isMinted] = await Promise.all([
+          ded.isDreamShared(entry.user, timestampForShare),
+          ded.isDreamMinted(entry.user, timestampForMint)
+        ]);
+        
+        setIsCurrentlyShared(isShared);
+        setIsMinted(isMinted);
+      } catch (error) {
+        console.error("Error checking dream status:", error);
+      }
+    };
+    
+    checkStatus();
+  }, [entry]);
+
+  const handleShare = async (e) => {
+    e.stopPropagation();
+    
+    if (isCurrentlyShared) {
+      try {
+        setIsUnsharing(true);
+        setShareError('');
+        
+        const result = await ded.revokeDreamShare(entry.user, entry.timestamp);
+        
+        if (result) {
+          setIsCurrentlyShared(false);
+          setShareLink('');
+        } else {
+          setShareError('Failed to revoke sharing. Please try again.');
+        }
+      } catch (error) {
+        console.error('Error unsharing dream:', error);
+        setShareError('Failed to revoke sharing: ' + (error.message || 'Unknown error'));
+      } finally {
+        setIsUnsharing(false);
+      }
+    } else {
+      try {
+        setIsSharing(true);
+        setShareError('');
+        setShareLink('');
+        
+        const result = await ded.createShareableLink(entry.user, entry.timestamp);
+        
+        if (result.length === 0) {
+          setShareError('Could not create share link. Please try again.');
+          return;
+        }
+        
+        const shareId = result[0];
+        const shareUrl = `${window.location.origin}/shared/${shareId}`;
+        setShareLink(shareUrl);
+        setIsCurrentlyShared(true);
+        
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          setClipboardStatus('Copied to clipboard!');
+          setTimeout(() => setClipboardStatus(''), 2000);
+        } catch (clipboardError) {
+          console.log('Auto-copy failed, user may need to copy manually', clipboardError);
+          setClipboardStatus('Click to copy');
+        }
+      } catch (error) {
+        console.error('Error creating share link:', error);
+        setShareError('Failed to create share link. Please try again.');
+      } finally {
+        setIsSharing(false);
+      }
+    }
+  };
+
+  const handleMintNFT = async (e) => {
+    e.stopPropagation();
+    
+    if (isMinted) {
+      try {
+        setIsBurning(true);
+        setMintError('');
+        
+        const timestampInt = parseInt(entry.timestamp, 10);
+        
+        const result = await ded.burnDreamNFT(entry.user, timestampInt);
+        
+        if (result) {
+          setIsMinted(false);
+        } else {
+          setMintError('Failed to burn NFT. Please try again later.');
+        }
+      } catch (error) {
+        console.error('Error burning NFT:', error);
+        setMintError('Failed to burn NFT: ' + (error.message || 'Unknown error'));
+      } finally {
+        setIsBurning(false);
+      }
+    } else {
+      try {
+        setIsMinting(true);
+        setMintError('');
+        setMintSuccess(false);
+        
+        const timestampInt = parseInt(entry.timestamp, 10);
+        const dateStr = new Date(Number(entry.timestamp)).toLocaleDateString();
+        
+        const result = await ded.mintDreamNFT(
+          entry.user,
+          timestampInt,
+          `Dream visualization from ${dateStr}`
+        );
+        
+        if (result === null || result === undefined) {
+          setMintError('Could not mint NFT. Please try again later.');
+          return;
+        }
+        
+        setIsMinted(true);
+        setMintSuccess(true);
+      } catch (error) {
+        console.error('Error minting NFT:', error);
+        setMintError('Failed to mint NFT: ' + (error.message || 'Unknown error'));
+      } finally {
+        setIsMinting(false);
+      }
+    }
+  };
+
+  const handleEdit = () => {
+    if (isMinted) {
+      setMintError('This dream cannot be edited because it has been minted as an NFT. Burn the NFT first to edit.');
+      return;
+    }
+    
+    selectDreamForEditing(entry);
+    setIsAnalyzed(true);
+    setActiveTab('write');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleMintedDeleteAttempt = () => {
+    setMintError('This dream cannot be deleted because it has been minted as an NFT. Burn the NFT first to delete.');
+  };
+
   const toggleOpen = (e) => {
     e.preventDefault();
     
@@ -39,12 +191,9 @@ const DreamEntryItem = ({ entry }) => {
       setIsExpanding(true);
       setIsOpen(true);
       
-      // Reset animation state after transition completes
       setTimeout(() => {
         setIsExpanding(false);
-        // Scroll entry into better view if it's now open
         if (entryRef.current) {
-          // Better scroll behavior - only scroll if entry is not fully visible
           const rect = entryRef.current.getBoundingClientRect();
           if (rect.top < 80 || rect.bottom > window.innerHeight) {
             entryRef.current.scrollIntoView({ 
@@ -53,11 +202,10 @@ const DreamEntryItem = ({ entry }) => {
             });
           }
         }
-      }, 300); // Match this with the CSS transition duration
+      }, 300);
     }
   };
 
-  // Calculate content height for smooth animations
   useEffect(() => {
     if (isOpen && contentRef.current) {
       setContentHeight(`${contentRef.current.scrollHeight}px`);
@@ -66,14 +214,12 @@ const DreamEntryItem = ({ entry }) => {
     }
   }, [isOpen, entry]);
 
-  // Auto-dismiss notifications with better UX
   useEffect(() => {
     if (shareLink || shareError || mintSuccess || mintError) {
       if (notificationTimerRef.current) {
         clearTimeout(notificationTimerRef.current);
       }
       
-      // Longer time for success notifications, shorter for errors
       const dismissTime = shareLink || mintSuccess ? 12000 : 6000;
       
       notificationTimerRef.current = setTimeout(() => {
@@ -86,7 +232,6 @@ const DreamEntryItem = ({ entry }) => {
         if (mintSuccess) {
           setMintSuccess(false);
         }
-        // Keep shareLink until user explicitly dismisses
       }, dismissTime); 
     }
     
@@ -97,7 +242,6 @@ const DreamEntryItem = ({ entry }) => {
     };
   }, [shareLink, shareError, mintSuccess, mintError]);
 
-  // Dismiss notifications manually
   const dismissNotification = (type) => {
     if (type === 'share') {
       setShareLink('');
@@ -108,48 +252,6 @@ const DreamEntryItem = ({ entry }) => {
     }
   };
 
-  const handleEdit = () => {
-    selectDreamForEditing(entry);
-    setIsAnalyzed(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleShare = async (e) => {
-    e.stopPropagation();
-    try {
-      setIsSharing(true);
-      setShareError('');
-      setShareLink('');
-      
-      const result = await ded.createShareableLink(entry.user, entry.timestamp);
-      
-      if (result.length === 0) {
-        setShareError('Could not create share link. Please try again.');
-        return;
-      }
-      
-      const shareId = result[0];
-      const shareUrl = `${window.location.origin}/shared/${shareId}`;
-      setShareLink(shareUrl);
-      
-      // Try to copy to clipboard but with better error handling
-      try {
-        await navigator.clipboard.writeText(shareUrl);
-        setClipboardStatus('Copied to clipboard!');
-        setTimeout(() => setClipboardStatus(''), 2000);
-      } catch (clipboardError) {
-        console.log('Auto-copy failed, user may need to copy manually', clipboardError);
-        setClipboardStatus('Click to copy');
-      }
-    } catch (error) {
-      console.error('Error creating share link:', error);
-      setShareError('Failed to create share link. Please try again.');
-    } finally {
-      setIsSharing(false);
-    }
-  };
-
-  // Handle copy with fallback methods
   const handleCopyClick = async (e) => {
     e.stopPropagation();
     try {
@@ -157,7 +259,6 @@ const DreamEntryItem = ({ entry }) => {
       setClipboardStatus('Copied to clipboard!');
       setTimeout(() => setClipboardStatus(''), 2000);
     } catch (error) {
-      // Fallback for clipboard permissions issues
       const tempInput = document.createElement('input');
       tempInput.value = shareLink;
       document.body.appendChild(tempInput);
@@ -175,34 +276,6 @@ const DreamEntryItem = ({ entry }) => {
     }
   };
 
-  // Handle NFT minting with improved feedback
-  const handleMintNFT = async (e) => {
-    e.stopPropagation();
-    try {
-      setIsMinting(true);
-      setMintError('');
-      setMintSuccess(false);
-      
-      const name = `Dream Vision #${new Date(Number(entry.timestamp)).toLocaleDateString()}`;
-      const description = `AI visualization of dream: "${entry.dreamText.substring(0, 100)}${entry.dreamText.length > 100 ? '...' : ''}"`;
-      
-      const result = await ded.mintDreamNFT(entry.user, entry.timestamp, name, description);
-      
-      if (!result.length) {
-        setMintError('Could not mint NFT. Please try again later.');
-        return;
-      }
-      
-      setMintSuccess(true);
-    } catch (error) {
-      console.error('Error minting NFT:', error);
-      setMintError('Failed to mint NFT: ' + (error.message || 'Unknown error'));
-    } finally {
-      setIsMinting(false);
-    }
-  };
-
-  // Smooth image zoom toggle
   const toggleImageZoom = (e) => {
     e.stopPropagation();
     setImageZoomed(!imageZoomed);
@@ -224,7 +297,6 @@ const DreamEntryItem = ({ entry }) => {
     });
   };
 
-  // Extract a preview snippet
   const getDreamPreview = () => {
     if (!entry.dreamText) return "";
     
@@ -236,7 +308,6 @@ const DreamEntryItem = ({ entry }) => {
     return text.substring(0, maxLength) + "...";
   };
 
-  // Format date for header display
   const formatDreamDate = (timestamp) => {
     if (!timestamp) return null;
     
@@ -248,17 +319,14 @@ const DreamEntryItem = ({ entry }) => {
     const yesterday = new Date(now);
     yesterday.setDate(yesterday.getDate() - 1);
     
-    // Today
     if (date.toDateString() === now.toDateString()) {
       return `Today at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     }
     
-    // Yesterday
     if (date.toDateString() === yesterday.toDateString()) {
       return `Yesterday at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
     }
     
-    // Older
     return date.toLocaleDateString(undefined, {
       month: 'short',
       day: 'numeric',
@@ -266,9 +334,9 @@ const DreamEntryItem = ({ entry }) => {
     }) + ` at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
   };
 
-  const createdDate = formatDate(entry.timestamp);
-  const updatedDate = formatDate(entry.lastUpdated);
-  const isUpdated = entry.lastUpdated && Number(entry.lastUpdated) !== Number(entry.timestamp);
+  const createdDate = formatDate(entry.created);
+  const updatedDate = formatDate(entry.updated);
+  const isUpdated = entry.updated && Number(entry.updated) !== Number(entry.timestamp);
   const headerDate = formatDreamDate(entry.timestamp);
   const dreamPreview = getDreamPreview();
   
@@ -282,7 +350,7 @@ const DreamEntryItem = ({ entry }) => {
 
   return (
     <article 
-      className={`dream-entry-item ${isOpen ? 'expanded' : ''} ${isExpanding ? 'expanding' : ''} ${isCollapsing ? 'collapsing' : ''}`} 
+      className={`dream-entry-item ${isOpen ? 'expanded' : ''} ${isExpanding ? 'expanding' : ''} ${isCollapsing ? 'collapsing' : ''} ${isMinted ? 'is-minted' : ''}`} 
       ref={entryRef}
     >
       <div className="entry-card">
@@ -390,23 +458,31 @@ const DreamEntryItem = ({ entry }) => {
                 <div className="primary-actions">
                   <button
                     onClick={handleShare}
-                    className="dream-button share-button"
-                    aria-label="Share this dream"
-                    disabled={isSharing}
+                    className={`dream-button ${isCurrentlyShared ? 'unshare-button' : 'share-button'}`}
+                    aria-label={isCurrentlyShared ? "Stop sharing this dream" : "Share this dream"}
+                    disabled={isSharing || isUnsharing}
                   >
-                    <i className="fas fa-share-alt"></i>
-                    <span>{isSharing ? 'Sharing...' : 'Share'}</span>
+                    <i className={`fas ${isCurrentlyShared ? 'fa-unlink' : 'fa-share-alt'}`}></i>
+                    <span>
+                      {isSharing ? 'Sharing...' : 
+                       isUnsharing ? 'Unsharing...' : 
+                       isCurrentlyShared ? 'Unshare' : 'Share'}
+                    </span>
                   </button>
 
                   {hasVisualizations && (
                     <button
                       onClick={handleMintNFT}
-                      className="dream-button mint-button"
-                      aria-label="Mint as NFT"
-                      disabled={isMinting}
+                      className={`dream-button ${isMinted ? 'burn-button' : 'mint-button'}`}
+                      aria-label={isMinted ? "Burn this NFT" : "Mint as NFT"}
+                      disabled={isMinting || isBurning}
                     >
-                      <i className="fas fa-gem"></i>
-                      <span>{isMinting ? 'Minting...' : 'Mint NFT'}</span>
+                      <i className={`fas ${isMinted ? 'fa-fire' : 'fa-gem'}`}></i>
+                      <span>
+                        {isMinting ? 'Minting...' : 
+                         isBurning ? 'Burning...' : 
+                         isMinted ? 'Burn NFT' : 'Mint NFT'}
+                      </span>
                     </button>
                   )}
                 </div>
@@ -414,16 +490,20 @@ const DreamEntryItem = ({ entry }) => {
                 <div className="management-actions">
                   <button
                     onClick={handleEdit}
-                    className="dream-button edit-button"
+                    className={`dream-button edit-button ${isMinted ? 'disabled' : ''}`}
                     aria-label="Edit this dream"
+                    disabled={isMinted}
+                    title={isMinted ? "Dreams with minted NFTs cannot be edited" : "Edit this dream"}
                   >
                     <i className="fas fa-edit"></i>
                     <span>Edit</span>
                   </button>
                   <button
-                    onClick={() => setDreamToDelete(entry)}
-                    className="dream-button delete-button"
+                    onClick={isMinted ? handleMintedDeleteAttempt : () => setDreamToDelete(entry)}
+                    className={`dream-button delete-button ${isMinted ? 'disabled' : ''}`}
                     aria-label="Delete this dream"
+                    disabled={isMinted}
+                    title={isMinted ? "Dreams with minted NFTs cannot be deleted" : "Delete this dream"}
                   >
                     <i className="fas fa-trash"></i>
                     <span>Delete</span>
@@ -435,7 +515,6 @@ const DreamEntryItem = ({ entry }) => {
         </div>
       </div>
       
-      {/* Notifications with improved UX */}
       {(shareLink || shareError) && (
         <div className={`notification-panel ${shareLink ? 'success-panel' : 'error-panel'} share-notification`}>
           <button className="dismiss-notification" onClick={() => dismissNotification('share')} aria-label="Dismiss notification">
@@ -502,7 +581,6 @@ const DreamEntryItem = ({ entry }) => {
         </div>
       )}
       
-      {/* Modal for image zoom */}
       {imageZoomed && (
         <div className="image-modal-backdrop" onClick={toggleImageZoom} role="dialog" aria-label="Zoomed image">
           <div className="image-modal">

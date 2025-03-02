@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import DreamForm from './DreamForm';
 import DreamAnalysis from './DreamAnalysis';
 import DreamEntryList from './DreamEntryList';
@@ -6,7 +6,7 @@ import { useDreams } from '../../context/DreamContext';
 import '../styles/DreamsPage.scss';
 
 const DreamsPage = () => {
-  const [activeTab, setActiveTab] = useState('write');
+  const { activeTab, setActiveTab } = useDreams();
   const { currentDream, isAnalyzing, isAnalyzed, } = useDreams();
   
   useEffect(() => {

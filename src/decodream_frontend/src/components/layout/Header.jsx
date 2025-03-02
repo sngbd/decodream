@@ -10,7 +10,6 @@ const Header = () => {
   const navRef = useRef(null);
   const location = useLocation();
 
-  // Handle clicks outside the menu to close it
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (navRef.current && !navRef.current.contains(event.target) && 
@@ -25,7 +24,6 @@ const Header = () => {
     };
   }, []);
 
-  // Close mobile menu on window resize
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 768 && mobileMenuOpen) {
@@ -39,7 +37,6 @@ const Header = () => {
     };
   }, [mobileMenuOpen]);
 
-  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 20) {
@@ -55,7 +52,6 @@ const Header = () => {
     };
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location]);

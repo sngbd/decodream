@@ -2,18 +2,17 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { DreamProvider } from "./context/DreamContext";
-import DreamForm from "./components/dream/DreamForm";
-import DreamAnalysis from "./components/dream/DreamAnalysis";
-import DreamEntryList from "./components/dream/DreamEntryList";
 import LandingPage from "./components/layout/LandingPage";
 import Layout from "./components/layout/Layout";
 import SharedDreamView from "./components/dream/SharedDreamView";
 import DreamNFTGallery from "./components/dream/DreamNFTGallery";
 import DreamsPage from "./components/dream/DreamsPage";
+import ScrollToTop from "./components/common/ScrollToTop";
 
 const App = () => {
   return (
     <Router>
+      <ScrollToTop />
       <AuthProvider>
         <DreamProvider>
           <Layout>
@@ -30,6 +29,12 @@ const App = () => {
                 path="/shared/:shareId"
                 element={
                   <SharedDreamView />
+                }
+              />
+              <Route
+                path="/nft-gallery/:principalId"
+                element={
+                  <DreamNFTGallery />
                 }
               />
               <Route

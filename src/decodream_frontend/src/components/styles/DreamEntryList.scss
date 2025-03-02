@@ -31,39 +31,55 @@
     
     .entries-actions {
       display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 15px;
+      flex-direction: row;
+      gap: 10px;
+      width: 100%;
       
       .filter-controls {
         display: flex;
+        flex-direction: row;
         gap: 10px;
+        margin-top: 12px;
+        width: 100%;
         
         .sort-control,
         .filter-control {
           position: relative;
+          background: rgba(30, 30, 40, 0.6);
+          border-radius: 8px;
+          padding: 3px;
+          width: 100%;
+          max-width: 250px;
           
           select {
             appearance: none;
-            padding: 8px 35px 8px 15px;
-            border-radius: 8px;
-            background: rgba(15, 5, 36, 0.8);
-            border: 1px solid $dream-panel-border;
-            color: $dream-text-primary;
-            font-family: $font-secondary;
+            background: transparent;
+            width: 100%;
+            padding: 7px 12px;
+            padding-right: 30px;
+            border: none;
+            border-radius: 6px;
+            color: $dream-text-secondary;
+            font-family: $font-body;
             font-size: 0.9rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            
+            &:hover {
+              color: $dream-text-primary;
+              background: rgba(60, 60, 80, 0.4);
+            }
             
             &:focus {
               outline: none;
-              border-color: $dream-accent;
-              box-shadow: 0 0 0 2px rgba($dream-accent, 0.2);
+              box-shadow: 0 0 0 2px rgba($dream-accent, 0.5);
+              color: $dream-text-primary;
             }
             
-            &:hover {
-              background: rgba(15, 5, 36, 1);
-              border-color: rgba($dream-accent, 0.5);
+            option {
+              background-color: rgba(20, 10, 45, 0.95);
+              color: $dream-text-primary;
+              padding: 10px;
             }
           }
           
@@ -72,11 +88,20 @@
             right: 12px;
             top: 50%;
             transform: translateY(-50%);
+            color: $dream-text-secondary;
             pointer-events: none;
+            font-size: 0.8rem;
+            transition: color 0.2s ease;
+          }
+
+          &:hover i {
             color: $dream-accent;
-            font-size: 0.9rem;
           }
         }
+      }
+
+      @media (min-width: $breakpoint-tablet) {
+        align-items: flex-end;
       }
     }
   }
@@ -107,8 +132,14 @@
   .loading-container {
     display: flex;
     justify-content: center;
-    padding: 50px 0;
+    align-items: center;
     min-height: 200px;
+    
+    .loading-status {
+      font-size: 0.9rem;
+      color: $dream-text-secondary;
+      margin-top: 15px;
+    }
   }
   
   .empty-state {
@@ -313,6 +344,77 @@
           }
         }
       }
+    }
+  }
+}
+
+.filter-tabs {
+  display: flex;
+  background: rgba(30, 30, 40, 0.6);
+  border-radius: 8px;
+  padding: 3px;
+  width: 100%;
+  
+  .filter-tab {
+    background: none;
+    border: none;
+    color: $dream-text-secondary;
+    padding: 7px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    justify-content: center;
+    
+    &:hover:not(:disabled) {
+      color: $dream-text-primary;
+      background: rgba(60, 60, 80, 0.4);
+    }
+    
+    &.active {
+      background: $dream-accent-dark;
+      color: $dream-text-primary;
+      
+      .count {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+    
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .count {
+      background: rgba(60, 60, 80, 0.6);
+      border-radius: 10px;
+      padding: 1px 6px;
+      font-size: 0.75rem;
+      min-width: 20px;
+      text-align: center;
+    }
+  }
+}
+
+@media (min-width: $breakpoint-tablet) {
+  .filter-controls {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    
+    .sort-control {
+      width: auto;
+      min-width: 180px;
+    }
+    
+    .filter-tabs {
+      width: auto;
+      flex-grow: 1;
+      max-width: 500px;
     }
   }
 }
