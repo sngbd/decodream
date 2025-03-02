@@ -18,6 +18,8 @@ export const DreamProvider = ({ children }) => {
   const [filteredEntries, setFilteredEntries] = useState([]);
   const [dreamToDelete, setDreamToDelete] = useState(null);
   const [currentImage, setCurrentImage] = useState('');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isAnalyzed, setIsAnalyzed] = useState(false);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -171,6 +173,10 @@ export const DreamProvider = ({ children }) => {
     clearDreamToDelete,
     currentImage,
     setCurrentImage,
+    isAnalyzing,
+    setIsAnalyzing,
+    isAnalyzed,
+    setIsAnalyzed,
   };
 
   return <DreamContext.Provider value={value}>{children}</DreamContext.Provider>;

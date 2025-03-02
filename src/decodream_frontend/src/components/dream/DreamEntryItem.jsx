@@ -1,15 +1,211 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { Link } from "react-router-dom";
 import Markdown from "react-markdown";
 import { useDreams } from "../../context/DreamContext";
 import "../styles/DreamEntryItem.scss";
+import { decodream_backend as ded } from '../../../../declarations/decodream_backend';
 
 const DreamEntryItem = ({ entry }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { selectDreamForEditing, setDreamToDelete } = useDreams();
+  const [isExpanding, setIsExpanding] = useState(false);
+  const [isCollapsing, setIsCollapsing] = useState(false);
+  const [contentHeight, setContentHeight] = useState("0px");
+  const { selectDreamForEditing, setDreamToDelete, setIsAnalyzed } = useDreams();
+  const [isSharing, setIsSharing] = useState(false);
+  const [shareLink, setShareLink] = useState('');
+  const [shareError, setShareError] = useState('');
+  const [isMinting, setIsMinting] = useState(false);
+  const [mintSuccess, setMintSuccess] = useState(false);
+  const [mintError, setMintError] = useState('');
+  const [clipboardStatus, setClipboardStatus] = useState('');
+  const [imageZoomed, setImageZoomed] = useState(false);
+  
+  const contentRef = useRef(null);
+  const notificationTimerRef = useRef(null);
+  const entryRef = useRef(null);
+
+  // Improved smooth toggle with proper timings
+  const toggleOpen = (e) => {
+    e.preventDefault();
+    
+    if (isOpen) {
+      setIsCollapsing(true);
+      setIsOpen(false);
+      
+      setTimeout(() => {
+        setIsCollapsing(false);
+      }, 300);
+    } else {
+      setIsExpanding(true);
+      setIsOpen(true);
+      
+      // Reset animation state after transition completes
+      setTimeout(() => {
+        setIsExpanding(false);
+        // Scroll entry into better view if it's now open
+        if (entryRef.current) {
+          // Better scroll behavior - only scroll if entry is not fully visible
+          const rect = entryRef.current.getBoundingClientRect();
+          if (rect.top < 80 || rect.bottom > window.innerHeight) {
+            entryRef.current.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center'
+            });
+          }
+        }
+      }, 300); // Match this with the CSS transition duration
+    }
+  };
+
+  // Calculate content height for smooth animations
+  useEffect(() => {
+    if (isOpen && contentRef.current) {
+      setContentHeight(`${contentRef.current.scrollHeight}px`);
+    } else {
+      setContentHeight("0px");
+    }
+  }, [isOpen, entry]);
+
+  // Auto-dismiss notifications with better UX
+  useEffect(() => {
+    if (shareLink || shareError || mintSuccess || mintError) {
+      if (notificationTimerRef.current) {
+        clearTimeout(notificationTimerRef.current);
+      }
+      
+      // Longer time for success notifications, shorter for errors
+      const dismissTime = shareLink || mintSuccess ? 12000 : 6000;
+      
+      notificationTimerRef.current = setTimeout(() => {
+        if (shareError) {
+          setShareError('');
+        }
+        if (mintError) {
+          setMintError('');
+        }
+        if (mintSuccess) {
+          setMintSuccess(false);
+        }
+        // Keep shareLink until user explicitly dismisses
+      }, dismissTime); 
+    }
+    
+    return () => {
+      if (notificationTimerRef.current) {
+        clearTimeout(notificationTimerRef.current);
+      }
+    };
+  }, [shareLink, shareError, mintSuccess, mintError]);
+
+  // Dismiss notifications manually
+  const dismissNotification = (type) => {
+    if (type === 'share') {
+      setShareLink('');
+      setShareError('');
+    } else if (type === 'mint') {
+      setMintSuccess(false);
+      setMintError('');
+    }
+  };
 
   const handleEdit = () => {
     selectDreamForEditing(entry);
+    setIsAnalyzed(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleShare = async (e) => {
+    e.stopPropagation();
+    try {
+      setIsSharing(true);
+      setShareError('');
+      setShareLink('');
+      
+      const result = await ded.createShareableLink(entry.user, entry.timestamp);
+      
+      if (result.length === 0) {
+        setShareError('Could not create share link. Please try again.');
+        return;
+      }
+      
+      const shareId = result[0];
+      const shareUrl = `${window.location.origin}/shared/${shareId}`;
+      setShareLink(shareUrl);
+      
+      // Try to copy to clipboard but with better error handling
+      try {
+        await navigator.clipboard.writeText(shareUrl);
+        setClipboardStatus('Copied to clipboard!');
+        setTimeout(() => setClipboardStatus(''), 2000);
+      } catch (clipboardError) {
+        console.log('Auto-copy failed, user may need to copy manually', clipboardError);
+        setClipboardStatus('Click to copy');
+      }
+    } catch (error) {
+      console.error('Error creating share link:', error);
+      setShareError('Failed to create share link. Please try again.');
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
+  // Handle copy with fallback methods
+  const handleCopyClick = async (e) => {
+    e.stopPropagation();
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      setClipboardStatus('Copied to clipboard!');
+      setTimeout(() => setClipboardStatus(''), 2000);
+    } catch (error) {
+      // Fallback for clipboard permissions issues
+      const tempInput = document.createElement('input');
+      tempInput.value = shareLink;
+      document.body.appendChild(tempInput);
+      tempInput.select();
+      
+      try {
+        document.execCommand('copy');
+        setClipboardStatus('Copied to clipboard!');
+      } catch (err) {
+        setClipboardStatus('Please copy manually');
+      }
+      
+      document.body.removeChild(tempInput);
+      setTimeout(() => setClipboardStatus(''), 2000);
+    }
+  };
+
+  // Handle NFT minting with improved feedback
+  const handleMintNFT = async (e) => {
+    e.stopPropagation();
+    try {
+      setIsMinting(true);
+      setMintError('');
+      setMintSuccess(false);
+      
+      const name = `Dream Vision #${new Date(Number(entry.timestamp)).toLocaleDateString()}`;
+      const description = `AI visualization of dream: "${entry.dreamText.substring(0, 100)}${entry.dreamText.length > 100 ? '...' : ''}"`;
+      
+      const result = await ded.mintDreamNFT(entry.user, entry.timestamp, name, description);
+      
+      if (!result.length) {
+        setMintError('Could not mint NFT. Please try again later.');
+        return;
+      }
+      
+      setMintSuccess(true);
+    } catch (error) {
+      console.error('Error minting NFT:', error);
+      setMintError('Failed to mint NFT: ' + (error.message || 'Unknown error'));
+    } finally {
+      setIsMinting(false);
+    }
+  };
+
+  // Smooth image zoom toggle
+  const toggleImageZoom = (e) => {
+    e.stopPropagation();
+    setImageZoomed(!imageZoomed);
   };
 
   const formatDate = (timestamp) => {
@@ -28,97 +224,300 @@ const DreamEntryItem = ({ entry }) => {
     });
   };
 
-  const toggleOpen = (e) => {
-    e.preventDefault();
-    setIsOpen(!isOpen);
+  // Extract a preview snippet
+  const getDreamPreview = () => {
+    if (!entry.dreamText) return "";
+    
+    const maxLength = 120;
+    const text = entry.dreamText.trim();
+    
+    if (text.length <= maxLength) return text;
+    
+    return text.substring(0, maxLength) + "...";
   };
 
-  const entryId = entry.id || entry.timestamp;
+  // Format date for header display
+  const formatDreamDate = (timestamp) => {
+    if (!timestamp) return null;
+    
+    const date = new Date(Number(timestamp));
+    
+    if (isNaN(date.getTime())) return null;
+    
+    const now = new Date();
+    const yesterday = new Date(now);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    // Today
+    if (date.toDateString() === now.toDateString()) {
+      return `Today at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    }
+    
+    // Yesterday
+    if (date.toDateString() === yesterday.toDateString()) {
+      return `Yesterday at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+    }
+    
+    // Older
+    return date.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    }) + ` at ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  };
+
   const createdDate = formatDate(entry.timestamp);
   const updatedDate = formatDate(entry.lastUpdated);
   const isUpdated = entry.lastUpdated && Number(entry.lastUpdated) !== Number(entry.timestamp);
+  const headerDate = formatDreamDate(entry.timestamp);
+  const dreamPreview = getDreamPreview();
   
-  const detailsId = `dream-details-${entryId}`;
-  const summaryId = `dream-summary-${entryId}`;
+  const hasVisualizations = entry.imageData && entry.imageData !== "";
+  const hasAnalysis = entry.analysis && entry.analysis !== "";
+  
+  const dreamTitle = entry.dreamText && entry.dreamText.split(/\n|\.\s+/)[0].trim();
+  const displayTitle = dreamTitle && dreamTitle.length > 3 && dreamTitle.length < 80 
+    ? dreamTitle 
+    : "Dream Entry";
 
   return (
-    <article className="dream-entry-item">
-      <div className="entry-header">
-        <div className="entry-dates">
-          {createdDate && (
-            <p className="date-created">
-              <time dateTime={new Date(Number(entry.timestamp)).toISOString()}>
-                <strong>Created:</strong> {createdDate}
-              </time>
+    <article 
+      className={`dream-entry-item ${isOpen ? 'expanded' : ''} ${isExpanding ? 'expanding' : ''} ${isCollapsing ? 'collapsing' : ''}`} 
+      ref={entryRef}
+    >
+      <div className="entry-card">
+        <div 
+          className="entry-header" 
+          role="button" 
+          onClick={toggleOpen} 
+          tabIndex={0} 
+          aria-expanded={isOpen}
+        >
+          <div className="entry-header-content">
+            <h3 className="entry-title">
+              {displayTitle}
+              <span className="toggle-indicator">
+                <i className={`fas fa-chevron-${isOpen ? 'up' : 'down'}`}></i>
+              </span>
+            </h3>
+            
+            <p className="entry-date">
+              <i className="far fa-calendar-alt"></i> {headerDate}
             </p>
-          )}
-          {isUpdated && updatedDate && (
-            <p className="date-updated">
-              <time dateTime={new Date(Number(entry.lastUpdated)).toISOString()}>
-                <strong>Updated:</strong> {updatedDate}
-              </time>
-            </p>
-          )}
+
+            {!isOpen && (
+              <p className="entry-preview">{dreamPreview}</p>
+            )}
+          </div>
+
+          <div className="entry-tags">
+            
+            {entry.isNFT && (
+              <span className="entry-tag is-nft" title="This dream has been minted as an NFT">
+                <i className="fas fa-gem"></i> NFT
+              </span>
+            )}
+            
+            {isUpdated && (
+              <span className="entry-tag is-edited" title="This dream has been edited">
+                <i className="fas fa-edit"></i> Edited
+              </span>
+            )}
+          </div>
         </div>
-        <div className="entry-actions">
-          <button
-            onClick={handleEdit}
-            className="edit-button"
-            aria-label="Edit this dream"
-          >
-            Edit
-          </button>
-          <button
-            onClick={() => setDreamToDelete(entry)}
-            className="delete-button"
-            aria-label="Delete this dream"
-          >
-            Delete
-          </button>
+        
+        <div 
+          className="entry-content-wrapper" 
+          style={{ height: contentHeight }}
+          aria-hidden={!isOpen}
+        >
+          <div className="entry-content" ref={contentRef}>
+            <div className="content-section">
+              <h4>Dream</h4>
+              <div className="dream-text">
+                {entry.dreamText.split('\n').map((paragraph, idx) => (
+                  paragraph ? <p key={idx}>{paragraph}</p> : <br key={idx} />
+                ))}
+              </div>
+              
+              {hasVisualizations && (
+                <div className="visualization-section">
+                  <h4>Dream Visualization</h4>
+                  <div className={`dream-image-container ${imageZoomed ? 'zoomed' : ''}`}>
+                    <img 
+                      src={`data:image/png;base64,${entry.imageData}`} 
+                      alt="Dream visualization"
+                      className="dream-image"
+                      onClick={toggleImageZoom}
+                      loading="lazy"
+                    />
+                    <div className="image-overlay">
+                      <button className="zoom-button" onClick={toggleImageZoom} aria-label="Zoom image">
+                        <i className={`fas ${imageZoomed ? 'fa-compress' : 'fa-expand'}`}></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {hasAnalysis && (
+                <div className="analysis-section">
+                  <h4>Analysis</h4>
+                  <div className="analysis-content">
+                    <Markdown>{entry.analysis}</Markdown>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <div className="entry-footer">
+              <div className="entry-metadata">
+                <div className="timestamp-info">
+                  {createdDate && (
+                    <p className="date-created">
+                      <i className="far fa-calendar-plus"></i> Created: {createdDate}
+                    </p>
+                  )}
+                  {isUpdated && updatedDate && (
+                    <p className="date-updated">
+                      <i className="far fa-calendar-check"></i> Updated: {updatedDate}
+                    </p>
+                  )}
+                </div>
+              </div>
+              
+              <div className="action-buttons">
+                <div className="primary-actions">
+                  <button
+                    onClick={handleShare}
+                    className="dream-button share-button"
+                    aria-label="Share this dream"
+                    disabled={isSharing}
+                  >
+                    <i className="fas fa-share-alt"></i>
+                    <span>{isSharing ? 'Sharing...' : 'Share'}</span>
+                  </button>
+
+                  {hasVisualizations && (
+                    <button
+                      onClick={handleMintNFT}
+                      className="dream-button mint-button"
+                      aria-label="Mint as NFT"
+                      disabled={isMinting}
+                    >
+                      <i className="fas fa-gem"></i>
+                      <span>{isMinting ? 'Minting...' : 'Mint NFT'}</span>
+                    </button>
+                  )}
+                </div>
+
+                <div className="management-actions">
+                  <button
+                    onClick={handleEdit}
+                    className="dream-button edit-button"
+                    aria-label="Edit this dream"
+                  >
+                    <i className="fas fa-edit"></i>
+                    <span>Edit</span>
+                  </button>
+                  <button
+                    onClick={() => setDreamToDelete(entry)}
+                    className="dream-button delete-button"
+                    aria-label="Delete this dream"
+                  >
+                    <i className="fas fa-trash"></i>
+                    <span>Delete</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       
-      <details 
-        open={isOpen} 
-        className="entry-details"
-        id={detailsId}
-      >
-        <summary 
-          onClick={toggleOpen}
-          className="entry-summary"
-          id={summaryId}
-          aria-expanded={isOpen}
-        >
-          <span className="summary-text">
-            {isOpen ? "Hide Dream and Analysis" : "View Dream and Analysis"}
-          </span>
-        </summary>
-        
-        {isOpen && (
-          <div className="entry-content">
-            <h3>Dream:</h3>
-            <p className="dream-text">{entry.dreamText}</p>
-
-            {entry.imageData != "" && (
-              <div>
-                <h3>Dream Visualization:</h3>
-                <div className="entry-image">
-                  <img 
-                    src={`data:image/png;base64,${entry.imageData}`} 
-                    alt="Dream visualization" 
-                    className="dream-image"
-                  />
-                </div>
+      {/* Notifications with improved UX */}
+      {(shareLink || shareError) && (
+        <div className={`notification-panel ${shareLink ? 'success-panel' : 'error-panel'} share-notification`}>
+          <button className="dismiss-notification" onClick={() => dismissNotification('share')} aria-label="Dismiss notification">
+            <i className="fas fa-times"></i>
+          </button>
+          
+          {shareLink && (
+            <>
+              <div className="notification-header">
+                <i className="fas fa-link"></i>
+                <span>Share link created!</span>
+                {clipboardStatus && <span className="clipboard-status">{clipboardStatus}</span>}
               </div>
-            )}
-
-            <h3>Analysis:</h3>
-            <div className="analysis-content">
-              <Markdown>{entry.analysis}</Markdown>
+              <div className="share-link">
+                <input 
+                  type="text" 
+                  value={shareLink} 
+                  readOnly 
+                  onClick={(e) => e.target.select()}
+                  aria-label="Shareable link"
+                />
+                <button 
+                  onClick={handleCopyClick}
+                  className="copy-button"
+                  aria-label="Copy link to clipboard"
+                >
+                  <i className="fas fa-copy"></i> Copy
+                </button>
+              </div>
+            </>
+          )}
+          
+          {shareError && (
+            <div className="notification-header">
+              <i className="fas fa-exclamation-circle"></i>
+              <span>{shareError}</span>
             </div>
+          )}
+        </div>
+      )}
+      
+      {(mintSuccess || mintError) && (
+        <div className={`notification-panel ${mintSuccess ? 'success-panel' : 'error-panel'} mint-notification`}>
+          <button className="dismiss-notification" onClick={() => dismissNotification('mint')} aria-label="Dismiss notification">
+            <i className="fas fa-times"></i>
+          </button>
+          
+          {mintSuccess && (
+            <div className="notification-header">
+              <i className="fas fa-check-circle"></i>
+              <span>NFT minted successfully!</span>
+              <Link to="/nft-gallery" className="gallery-link" onClick={(e) => e.stopPropagation()}>
+                View in Gallery <i className="fas fa-external-link-alt"></i>
+              </Link>
+            </div>
+          )}
+          
+          {mintError && (
+            <div className="notification-header">
+              <i className="fas fa-exclamation-circle"></i>
+              <span>{mintError}</span>
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* Modal for image zoom */}
+      {imageZoomed && (
+        <div className="image-modal-backdrop" onClick={toggleImageZoom} role="dialog" aria-label="Zoomed image">
+          <div className="image-modal">
+            <button className="close-modal" onClick={toggleImageZoom} aria-label="Close zoomed image">
+              <i className="fas fa-times"></i>
+            </button>
+            <img 
+              src={`data:image/png;base64,${entry.imageData}`} 
+              alt="Dream visualization"
+              className="modal-image"
+              onClick={(e) => e.stopPropagation()}
+            />
           </div>
-        )}
-      </details>
+        </div>
+      )}
     </article>
   );
 };

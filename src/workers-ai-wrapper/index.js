@@ -10,13 +10,13 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(bodyParser.json());
 
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
 app.post('/generate', async (req, res) => {
   try {
-    const { prompt, width = 1024, height = 1024, steps = 20, cfg_scale = 8 } = req.body;
+    const { prompt, width = 1024, height = 1024, steps = 20, cfg_scale = 10 } = req.body;
     
     if (!prompt) {
       return res.status(400).json({ error: 'Missing required parameter: prompt' });

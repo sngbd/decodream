@@ -113,5 +113,19 @@ module {
         dreamsByUser.put(entry.user, userDreams);
       }
     };
+
+    public func getEntryByTimestamp(user : Text, timestamp : Int) : ?Types.DreamEntry {
+      switch (dreamsByUser.get(user)) {
+        case (null) { null };
+        case (?entries) {
+          for (entry in entries.vals()) {
+            if (entry.timestamp == timestamp) {
+              return ?entry;
+            };
+          };
+          null;
+        };
+      };
+    }
   }
 }

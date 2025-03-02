@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import "../styles/Header.scss";
 
 const Header = () => {
   const { isLoggedIn, identity, login, logout, isAuthenticating } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const navRef = useRef(null);
+  const location = useLocation();
 
+  // Handle clicks outside the menu to close it
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (navRef.current && !navRef.current.contains(event.target) && 
@@ -22,6 +25,7 @@ const Header = () => {
     };
   }, []);
 
+  // Close mobile menu on window resize
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth > 768 && mobileMenuOpen) {
@@ -35,6 +39,27 @@ const Header = () => {
     };
   }, [mobileMenuOpen]);
 
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setScrolled(true);
+      } else {
+        setScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location]);
+
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
@@ -43,27 +68,33 @@ const Header = () => {
     if (!principal) return '';
     const principalStr = principal.toString();
     return principalStr.length > 10 
-      ? `${principalStr.substring(0, 8)}...` 
+      ? `${principalStr.substring(0, 5)}...${principalStr.substring(principalStr.length - 5)}` 
       : principalStr;
   };
 
   return (
-    <header className="main-header">
+    <header className={`main-header ${scrolled ? 'scrolled' : ''}`}>
       <div className="container">
         <div className="header-content">
           <div className="logo">
-            <Link to="/">Decodream</Link>
+            <Link to="/">
+              <span>Decodream</span>
+            </Link>
             <p className="tagline-header">Dream Analysis on the Internet Computer</p>
           </div>
           
           <button 
-            className="mobile-menu-toggle" 
+            className={`mobile-menu-toggle ${mobileMenuOpen ? 'active' : ''}`} 
             onClick={toggleMobileMenu}
             aria-label="Toggle navigation menu"
             aria-expanded={mobileMenuOpen}
             aria-controls="main-navigation"
           >
-            <i className={`fas ${mobileMenuOpen ? 'fa-times' : 'fa-bars'}`} aria-hidden="true"></i>
+            <span className="menu-icon">
+              <span className="bar"></span>
+              <span className="bar"></span>
+              <span className="bar"></span>
+            </span>
             <span className="sr-only">{mobileMenuOpen ? 'Close menu' : 'Open menu'}</span>
           </button>
           
@@ -75,46 +106,87 @@ const Header = () => {
           >
             {isLoggedIn ? (
               <div className="auth-container">
-                <div className="user-principal" title={identity?.getPrincipal()?.toString()}>
-                  <span className="principal-label">Principal ID:</span> 
-                  <span className="principal-value">
-                    {formatPrincipalId(identity?.getPrincipal())}
-                  </span>
+                <div className="nav-links">
+                  <Link 
+                    to="/dreams" 
+                    className={`nav-link ${location.pathname === '/dreams' ? 'active' : ''}`} 
+                  >
+                    <i className="fas fa-book-open nav-icon" aria-hidden="true"></i> 
+                    <span>My Dreams</span>
+                  </Link>
+
+                  <Link 
+                    to="/nft-gallery" 
+                    className={`nav-link ${location.pathname === '/nft-gallery' ? 'active' : ''}`}
+                  >
+                    <i className="fas fa-gem"></i> 
+                    <span>NFT Gallery</span>
+                  </Link>
                 </div>
-                <Link 
-                  to="/dreams" 
-                  className="nav-link" 
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  <i className="fas fa-book-open nav-icon" aria-hidden="true"></i> 
-                  <span>My Dreams</span>
-                </Link>
-                <button 
-                  onClick={() => {
-                    logout();
-                    setMobileMenuOpen(false);
-                  }} 
-                  disabled={isAuthenticating}
-                  className="nav-btn"
-                  aria-busy={isAuthenticating}
-                >
-                  <i className="fas fa-sign-out-alt nav-icon" aria-hidden="true"></i>
-                  <span>{isAuthenticating ? "Processing..." : "Logout"}</span>
-                </button>
+
+                <div className="user-section">
+                  <div className="user-principal" title={identity?.getPrincipal()?.toString()}>
+                    <span className="principal-label">ID:</span> 
+                    <span className="principal-value">
+                      {formatPrincipalId(identity?.getPrincipal())}
+                    </span>
+                    <span className="user-status">
+                      <span className="status-dot"></span>
+                      <span className="status-text">Connected</span>
+                    </span>
+                  </div>
+
+                  <button 
+                    onClick={() => logout()} 
+                    disabled={isAuthenticating}
+                    className={`nav-btn logout-btn ${isAuthenticating ? 'loading' : ''}`}
+                    aria-busy={isAuthenticating}
+                  >
+                    {isAuthenticating ? (
+                      <>
+                        <span className="spinner"></span>
+                        <span>Processing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-sign-out-alt nav-icon" aria-hidden="true"></i>
+                        <span>Logout</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
             ) : (
-              <button 
-                onClick={() => {
-                  login();
-                  setMobileMenuOpen(false);
-                }} 
-                disabled={isAuthenticating}
-                className="nav-btn"
-                aria-busy={isAuthenticating}
-              >
-                <i className="fas fa-sign-in-alt nav-icon" aria-hidden="true"></i>
-                <span>{isAuthenticating ? "Connecting..." : "Login with Internet Identity"}</span>
-              </button>
+              <div className="auth-container guest-container">
+                <div className="nav-links">
+                  <Link 
+                    to="/dreams" 
+                    className={`nav-link ${location.pathname === '/dreams' ? 'active' : ''}`} 
+                  >
+                    <i className="fas fa-feather-alt nav-icon" aria-hidden="true"></i> 
+                    <span>Try It Out</span>
+                  </Link>
+                </div>
+                
+                <button 
+                  onClick={() => login()} 
+                  disabled={isAuthenticating}
+                  className={`nav-btn login-btn ${isAuthenticating ? 'loading' : ''}`}
+                  aria-busy={isAuthenticating}
+                >
+                  {isAuthenticating ? (
+                    <>
+                      <span className="spinner"></span>
+                      <span>Connecting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <i className="fas fa-sign-in-alt nav-icon" aria-hidden="true"></i>
+                      <span>Login with Internet Identity</span>
+                    </>
+                  )}
+                </button>
+              </div>
             )}
           </nav>
         </div>

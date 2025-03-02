@@ -7,6 +7,9 @@ import DreamAnalysis from "./components/dream/DreamAnalysis";
 import DreamEntryList from "./components/dream/DreamEntryList";
 import LandingPage from "./components/layout/LandingPage";
 import Layout from "./components/layout/Layout";
+import SharedDreamView from "./components/dream/SharedDreamView";
+import DreamNFTGallery from "./components/dream/DreamNFTGallery";
+import DreamsPage from "./components/dream/DreamsPage";
 
 const App = () => {
   return (
@@ -19,11 +22,21 @@ const App = () => {
                 path="/dreams" 
                 element={
                   <>
-                    <DreamForm />
-                    <DreamAnalysis />
-                    <DreamEntryList />
+                    <DreamsPage />
                   </>
                 } 
+              />
+              <Route
+                path="/shared/:shareId"
+                element={
+                  <SharedDreamView />
+                }
+              />
+              <Route
+                path="/nft-gallery"
+                element={
+                  <DreamNFTGallery />
+                }
               />
               <Route
                 path="/"

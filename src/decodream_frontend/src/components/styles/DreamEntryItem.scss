@@ -1,312 +1,651 @@
 @import '../../variables';
 
 .dream-entry-item {
-  @include dream-panel;
   margin-bottom: 20px;
+  border-radius: 15px;
   overflow: hidden;
-  transition: transform 0.3s, box-shadow 0.3s;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
   
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
   }
   
-  .entry-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 20px;
-    background: rgba(20, 10, 45, 0.9);
-    flex-wrap: wrap;
-    gap: 10px;
+  &.expanded {
+    margin-bottom: 30px;
+  }
+  
+  .entry-card {
+    @include dream-panel;
+    padding: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
     
-    .entry-dates {
-      p {
-        margin: 0;
-        font-size: 0.9em;
-        color: $dream-text-secondary;
-        font-family: $font-secondary;
-        
-        strong {
-          color: $dream-accent;
-        }
-      }
-      
-      .date-updated {
-        margin-top: 3px;
-      }
-    }
-    
-    .entry-actions {
+    .entry-header {
       display: flex;
-      gap: 10px;
-      
-      .edit-button {
-        @include dream-button;
-        padding: 6px 12px;
-        font-size: 0.9em;
-      }
-      
-      .delete-button {
-        @include dream-button;
-        background: linear-gradient(135deg, darken($dream-danger, 20%), $dream-danger);
-        border-color: $dream-danger;
-        padding: 6px 12px;
-        font-size: 0.9em;
-        
-        &:hover {
-          background: linear-gradient(135deg, $dream-danger, lighten($dream-danger, 10%));
-        }
-      }
-    }
-  }
-  
-  details {
-    .entry-summary {
-      padding: 15px 20px;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 18px 20px;
+      background: rgba(15, 5, 36, 0.8);
       cursor: pointer;
+      transition: all 0.3s ease;
       position: relative;
-      font-family: $font-primary;
-      color: $dream-accent;
-      list-style: none;
-      transition: background-color 0.2s;
-      
-      &::-webkit-details-marker {
-        display: none;
-      }
-      
-      &::after {
-        content: '▼';
-        position: absolute;
-        right: 20px;
-        transition: transform 0.3s;
-      }
+      z-index: 2;
       
       &:hover {
-        background: rgba(138, 43, 226, 0.1);
+        background: rgba(31, 14, 61, 0.8);
       }
-    }
-    
-    &[open] {
-      .entry-summary::after {
-        transform: rotate(180deg);
-      }
-    }
-    
-    .entry-content {
-      padding: 5px 20px 20px;
       
-      h3 {
-        color: $dream-text-primary;
-        margin: 15px 0 10px;
-        position: relative;
-        display: inline-block;
+      .entry-header-content {
+        flex: 1;
+        min-width: 0;
         
-        &::after {
-          content: '';
-          position: absolute;
-          bottom: -5px;
-          left: 0;
-          width: 100%;
-          height: 1px;
-          background: linear-gradient(90deg, $dream-accent, transparent);
-        }
-      }
-      
-      .dream-text {
-        background: rgba(15, 5, 36, 0.8);
-        padding: 15px;
-        border-radius: 5px;
-        border-left: 3px solid $dream-accent;
-        white-space: pre-line;
-      }
-      
-      .analysis-content {
-        background: rgba(15, 5, 36, 0.8);
-        padding: 15px;
-        border-radius: 5px;
-        border-left: 3px solid $dream-primary;
-        @include scrollbar;
-        
-        p {
-          margin-top: 0;
-          margin-bottom: 1rem;
-          line-height: 1.6;
+        .entry-title {
           color: $dream-text-primary;
-        }
-        
-        h1, h2, h3, h4, h5, h6 {
-          color: $dream-accent;
-          margin-top: 1.5rem;
-          margin-bottom: 1rem;
-          font-family: $font-primary;
-          font-weight: 600;
-        }
-        
-        h1 { font-size: 1.8rem; }
-        h2 { font-size: 1.5rem; }
-        h3 { font-size: 1.3rem; }
-        h4 { font-size: 1.2rem; }
-        h5 { font-size: 1.1rem; }
-        h6 { font-size: 1rem; }
-        
-        ul, ol {
-          margin-bottom: 1.5rem;
-          padding-left: 1.5rem;
+          font-size: 1.1rem;
+          margin: 0 0 5px;
+          display: flex;
+          align-items: center;
+          gap: 10px;
           
-          li {
-            margin-bottom: 0.5rem;
-            line-height: 1.6;
+          .toggle-indicator {
+            margin-left: auto;
+            color: $dream-accent;
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+          }
+        }
+        
+        .entry-date {
+          color: $dream-text-secondary;
+          font-size: 0.85rem;
+          margin: 0 0 8px;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          
+          i {
+            color: rgba($dream-accent, 0.7);
+            font-size: 0.8rem;
+          }
+        }
+        
+        .entry-preview {
+          color: rgba($dream-text-primary, 0.8);
+          font-size: 0.9rem;
+          margin: 8px 0 0;
+          line-height: 1.5;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
+      }
+      
+      .entry-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-left: 10px;
+        
+        .entry-tag {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 3px 8px;
+          border-radius: 12px;
+          font-size: 0.75rem;
+          white-space: nowrap;
+          
+          i {
+            font-size: 0.7rem;
+          }
+          
+          &.is-nft {
+            background: rgba(255, 215, 0, 0.15);
+            color: #ffd700;
+          }
+          
+          &.is-edited {
+            background: rgba(100, 149, 237, 0.15);
+            color: #73b2ff;
+          }
+        }
+      }
+    }
+
+    .entry-footer {
+      .action-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        gap: 15px; // Reduced from 20px
+        margin-bottom: 5px; // Add a small bottom margin
+
+        
+        .primary-actions, .management-actions {
+          display: flex;
+          gap: 12px;
+        }
+        
+        .dream-button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 10px 18px;
+          border-radius: 12px;
+          font-size: 0.95rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          white-space: nowrap;
+          min-width: 120px;
+          color: $dream-text-primary;
+          position: relative;
+          
+          &:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba($dream-accent, 0.5);
+          }
+          
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+          
+          &:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: $button-glow;
+          }
+          
+          &:active:not(:disabled) {
+            transform: translateY(1px);
+          }
+          
+          i, svg {
+            font-size: 1rem;
+          }
+          
+          // Share button
+          &.share-button {
+            background-color: rgba(42, 82, 190, 0.8);
+            border: 1px solid rgba(66, 126, 235, 0.6);
             
-            &::marker {
-              color: $dream-accent;
+            i {
+              color: #9acdff;
+            }
+            
+            &:hover:not(:disabled) {
+              background-color: rgba(50, 100, 230, 0.9);
+              border-color: rgba(100, 150, 255, 0.8);
+            }
+          }
+          
+          // Mint button
+          &.mint-button {
+            background-color: rgba(138, 43, 226, 0.8); // Using dream-accent color base
+            border: 1px solid rgba(158, 63, 246, 0.6);
+            
+            i {
+              color: #e2b8ff;
+            }
+            
+            &:hover:not(:disabled) {
+              background-color: rgba(148, 53, 236, 0.9);
+              border-color: rgba(178, 83, 255, 0.8);
+            }
+          }
+          
+          // Edit button
+          &.edit-button {
+            background-color: rgba(23, 95, 170, 0.8);
+            border: 1px solid rgba(43, 125, 210, 0.6);
+            
+            i {
+              color: #a0c4ff;
+            }
+            
+            &:hover:not(:disabled) {
+              background-color: rgba(33, 115, 200, 0.9);
+              border-color: rgba(63, 145, 230, 0.8);
+            }
+          }
+          
+          // Delete button
+          &.delete-button {
+            background-color: rgba(180, 30, 40, 0.8);
+            border: 1px solid rgba(210, 50, 60, 0.6);
+            
+            i {
+              color: #ffc2c2;
+            }
+            
+            &:hover:not(:disabled) {
+              background-color: rgba(200, 40, 50, 0.9);
+              border-color: rgba(230, 60, 70, 0.8);
             }
           }
         }
+      }
+    }
+
+    .entry-content-wrapper {
+      height: 0;
+      overflow: hidden;
+      transition: height 0.3s ease;
+      
+      .entry-content {
+        padding: 0 20px 20px;
+        background: rgba(10, 3, 24, 0.8);
         
-        blockquote {
-          border-left: 4px solid $dream-accent;
-          padding: 0.5rem 0 0.5rem 1rem;
-          margin: 1.5rem 0;
-          background: rgba(138, 43, 226, 0.1);
-          font-style: italic;
-          
-          p {
-            color: $dream-text-secondary;
-            margin: 0.5rem 0;
+        .content-section {
+          &:first-child {
+            margin-top: 0;
+            padding-top: 0;
+            
+            h4 {
+              margin-top: 0px;
+            }
           }
-        }
-        
-        pre {
-          background: rgba(10, 2, 25, 0.8);
-          padding: 1rem;
-          border-radius: 5px;
-          overflow-x: auto;
-          margin: 1.5rem 0;
-          border: 1px solid rgba(138, 43, 226, 0.3);
           
-          code {
-            font-family: 'Courier New', monospace;
+          h4 {
+            color: $dream-accent;
+            font-size: 1.05rem;
+            margin: 15px 0 10px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba($dream-panel-border, 0.3);
+          }
+          
+          .dream-text {
             color: $dream-text-primary;
-            background: transparent;
-            padding: 0;
-            border-radius: 0;
+            line-height: 1.6;
+            
+            p {
+              margin-bottom: 12px;
+              
+              &:last-child {
+                margin-bottom: 0;
+              }
+            }
           }
-        }
-        
-        code {
-          background: rgba(138, 43, 226, 0.2);
-          color: $dream-accent;
-          font-family: 'Courier New', monospace;
-          padding: 0.2rem 0.4rem;
-          border-radius: 3px;
-          font-size: 0.9em;
-        }
-        
-        a {
-          color: $dream-highlight;
-          text-decoration: none;
-          border-bottom: 1px dashed $dream-highlight;
-          transition: color 0.2s, border-bottom 0.2s;
           
-          &:hover {
-            color: lighten($dream-highlight, 10%);
-            border-bottom: 1px solid lighten($dream-highlight, 10%);
+          .visualization-section {
+            margin-top: 15px;
+            
+            .dream-image-container {
+              position: relative;
+              display: block;
+              max-width: 100%;
+              border-radius: 12px;
+              overflow: hidden;
+              box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+              transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+              margin: 0 auto 15px; // Centered
+              border: 1px solid rgba($dream-accent, 0.2);
+              
+              .dream-image {
+                display: block;
+                width: 100%;
+                max-height: 400px; // Added max height constraint
+                object-fit: contain; // Maintain aspect ratio
+                transition: all 0.3s ease;
+                cursor: pointer;
+              }
+            }
           }
-        }
-        
-        table {
-          width: 100%;
-          border-collapse: collapse;
-          margin: 1.5rem 0;
-          
-          th {
-            background: rgba(75, 0, 130, 0.4);
+
+            // Improve the analysis content markdown styling
+          .analysis-content {
             color: $dream-text-primary;
-            font-weight: 600;
-            padding: 0.8rem;
-            text-align: left;
-            border-bottom: 2px solid $dream-accent;
+            line-height: 1.7;
+            font-size: 0.95rem;
+            
+            h1, h2, h3, h4, h5, h6 {
+              color: $dream-accent;
+              margin: 22px 0 12px;
+              font-weight: 600;
+              line-height: 1.3;
+              letter-spacing: 0.3px;
+              
+              &:first-child {
+                margin-top: 0;
+              }
+            }
+            
+            h1 { 
+              font-size: 1.4rem; 
+              border-bottom: 1px solid rgba($dream-accent, 0.2);
+              padding-bottom: 8px;
+            }
+            h2 { font-size: 1.3rem; }
+            h3 { font-size: 1.2rem; }
+            h4 { font-size: 1.1rem; }
+            h5 { font-size: 1.05rem; }
+            
+            ul, ol {
+              padding-left: 20px;
+              margin: 15px 0;
+              
+              li {
+                margin-bottom: 10px;
+                line-height: 1.5;
+                
+                &::marker {
+                  color: $dream-accent;
+                }
+                
+                & > p {
+                  margin: 0;
+                }
+              }
+            }
+            
+            p {
+              margin-bottom: 15px;
+            }
+            
+            blockquote {
+              border-left: 3px solid $dream-accent;
+              padding: 10px 15px;
+              margin: 15px 0;
+              font-style: italic;
+              color: rgba($dream-text-primary, 0.9);
+              background: rgba($dream-accent, 0.05);
+              border-radius: 0 8px 8px 0;
+            }
+            
+            code {
+              background: rgba(15, 5, 36, 0.6);
+              padding: 2px 5px;
+              border-radius: 4px;
+              font-family: $font-mono;
+              font-size: 0.9em;
+              color: #f8f8f2;
+              border: 1px solid rgba($dream-accent, 0.2);
+            }
+            
+            a {
+              color: $dream-accent;
+              text-decoration: none;
+              border-bottom: 1px dashed rgba($dream-accent, 0.4);
+              transition: all 0.2s ease;
+              
+              &:hover {
+                color: lighten($dream-accent, 15%);
+                border-bottom-color: lighten($dream-accent, 15%);
+              }
+            }
+            
+            img {
+              max-width: 100%;
+              border-radius: 8px;
+              margin: 15px 0;
+              box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            }
           }
-          
-          td {
-            padding: 0.8rem;
-            border-bottom: 1px solid rgba(138, 43, 226, 0.2);
+
+          // Improve image modal
+          .image-modal-backdrop {
+            .image-modal {
+              position: relative;
+              max-width: 90%; // Slightly reduced
+              max-height: 90vh;
+              
+              .modal-image {
+                max-width: 100%;
+                max-height: 80vh; // Reduced max height
+                object-fit: contain; // This ensures the image maintains its aspect ratio
+                background: #050212;
+                border-radius: 8px;
+                display: block; // Ensures no extra space
+              }
+              
+              // Better positioned close button
+              .close-modal {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                background: rgba(10, 3, 24, 0.8);
+                border: 1px solid rgba($dream-accent, 0.3);
+                width: 40px; // Larger clickable area
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                cursor: pointer;
+                z-index: 10;
+                
+                i {
+                  font-size: 1.1rem; // Larger icon
+                }
+                
+                &:hover {
+                  background: rgba($dream-accent, 0.4);
+                }
+              }
+            }
           }
-          
-          tr:nth-child(even) {
-            background: rgba(138, 43, 226, 0.05);
-          }
-          
-          tr:hover {
-            background: rgba(138, 43, 226, 0.1);
-          }
-        }
-        
-        hr {
-          border: 0;
-          height: 1px;
-          background: linear-gradient(90deg, transparent, $dream-accent, transparent);
-          margin: 2rem 0;
-        }
-        
-        strong {
-          color: $dream-accent;
-          font-weight: 600;
-        }
-        
-        em {
-          color: $dream-text-secondary;
         }
       }
     }
   }
 
-  .entry-image {
-    margin: 20px 0;
-    padding: 15px;
-    border-radius: 16px;
-    background: $dream-panel;
+  &.expanded {
+    margin-bottom: 30px;
+  }
+
+  &.collapsing .entry-content-wrapper {
+    animation: collapseContent 0.3s ease;
+  }
+
+}
+
+// Notification panels
+.notification-panel {
+  margin-top: 10px;
+  padding: 12px 15px;
+  border-radius: 8px;
+  position: relative;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  
+  &.success-panel {
+    background: rgba(40, 167, 69, 0.15);
+    border: 1px solid rgba(40, 167, 69, 0.3);
+  }
+  
+  &.error-panel {
+    background: rgba(220, 53, 69, 0.15);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+  }
+  
+  .dismiss-notification {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: $dream-text-secondary;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
     
-    h3 {
-      color: $dream-accent;
-      margin-bottom: 15px;
-      font-size: 1.1rem;
-      text-align: center;
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: $dream-text-primary;
+    }
+  }
+  
+  .notification-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    color: $dream-text-primary;
+    
+    i {
+      font-size: 1rem;
     }
     
-    .dream-image {
-      display: block;
-      max-width: 100%;
-      height: auto;
-      max-height: 400px;
-      margin: 0 auto;
-      border-radius: 10px;
-      border: 1px solid rgba($dream-accent, 0.3);
-      box-shadow: $panel-glow;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    .clipboard-status {
+      margin-left: auto;
+      font-size: 0.8rem;
+      color: $dream-text-secondary;
+    }
+  }
+  
+  .share-link {
+    display: flex;
+    gap: 10px;
+    
+    input {
+      flex: 1;
+      padding: 8px 10px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: $dream-text-primary;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      
+      &:focus {
+        outline: none;
+        border-color: rgba($dream-accent, 0.5);
+      }
+    }
+    
+    .copy-button {
+      background: rgba($dream-accent, 0.2);
+      color: $dream-accent;
+      border: none;
+      border-radius: 4px;
+      padding: 0 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
       
       &:hover {
-        transform: scale(1.02);
-        box-shadow: $button-glow;
+        background: rgba($dream-accent, 0.3);
       }
     }
+  }
+  
+  .gallery-link {
+    margin-left: auto;
+    color: $dream-accent;
+    text-decoration: none;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: all 0.2s ease;
     
-    @media (max-width: 768px) {
-      .dream-image {
-        max-height: 300px;
-      }
+    &:hover {
+      text-decoration: underline;
     }
   }
 }
 
-@media (max-width: 768px) {
-  .entry-header {
-    flex-direction: column;
-    align-items: flex-start !important;
+// Image modal
+.image-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.2s ease;
+  
+  .image-modal {
+    position: relative;
+    max-width: 95%;
+    max-height: 95%;
+    animation: zoomIn 0.3s ease;
     
-    .entry-dates {
-      margin-bottom: 10px;
+    .close-modal {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      background: rgba(0, 0, 0, 0.5);
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
     }
+    
+    .modal-image {
+      max-width: 100%;
+      max-height: 85vh;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      object-fit: contain;
+    }
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes expandContent {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes collapseContent {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+// Responsive adjustments
+@media (max-width: 767px) {
+  .entry-footer .action-buttons {
+    flex-direction: column;
+    
+    .primary-actions, .management-actions {
+      width: 100%;
+      justify-content: space-between;
+      
+      .dream-button {
+        flex: 1; // Make buttons take equal width on mobile
+        min-width: 0; // Allow buttons to shrink if needed
+        padding: 12px 10px; // Adjust padding for mobile
+      }
+    }
+  }
+  
+  .visualization-section .dream-image-container .dream-image {
+    max-height: 300px;
   }
 }

@@ -1,0 +1,116 @@
+@import '../../variables';
+
+.nft-card {
+  background: rgba(15, 5, 36, 0.8);
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: $panel-glow;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid $dream-panel-border;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: $button-glow;
+  }
+  
+  .nft-image-container {
+    position: relative;
+    padding-top: 100%;
+    overflow: hidden;
+    
+    .nft-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    
+    .nft-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: space-between;
+      
+      .nft-id {
+        background: $dream-accent;
+        padding: 3px 8px;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        color: white;
+      }
+    }
+    
+    &:hover .nft-image {
+      transform: scale(1.05);
+    }
+  }
+  
+  .nft-info {
+    padding: 15px;
+    
+    .nft-title {
+      margin: 0 0 10px 0;
+      font-size: 1.2rem;
+      color: $dream-accent;
+      text-shadow: $text-glow;
+    }
+    
+    .nft-mint-date {
+      color: $dream-text-secondary;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+    }
+    
+    .nft-actions {
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      
+      .toggle-details-button {
+        background: linear-gradient(135deg, $dream-secondary, $dream-primary);
+        border: none;
+        border-radius: 5px;
+        padding: 8px 15px;
+        color: $dream-text-primary;
+        cursor: pointer;
+        font-family: $font-secondary;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          filter: brightness(1.2);
+        }
+      }
+    }
+    
+    .nft-details {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid rgba($dream-accent, 0.3);
+      
+      .detail-item {
+        margin-bottom: 10px;
+        
+        h4 {
+          color: $dream-text-primary;
+          margin: 0 0 5px 0;
+          font-size: 0.9rem;
+        }
+        
+        p {
+          color: $dream-text-secondary;
+          margin: 0;
+          font-size: 0.9rem;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+}

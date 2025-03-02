@@ -1,0 +1,75 @@
+@import '../../variables';
+
+.dream-nft-gallery {
+  @include dream-panel;
+  padding: 25px;
+  margin-bottom: 30px;
+  
+  h2 {
+    color: $dream-accent;
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: $text-glow;
+  }
+  
+  .collection-info {
+    text-align: center;
+    color: $dream-text-secondary;
+    margin-bottom: 25px;
+    font-style: italic;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .nft-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    margin-top: 25px;
+  }
+  
+  &.loading, &.error, &.empty {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 300px;
+    padding: 40px;
+    
+    p {
+      margin-top: 15px;
+      color: $dream-text-secondary;
+      text-align: center;
+    }
+  }
+  
+  .empty-state {
+    background: rgba(15, 5, 36, 0.8);
+    border-radius: 10px;
+    padding: 25px;
+    max-width: 500px;
+    text-align: center;
+    margin: 25px auto;
+    border: 1px solid $dream-panel-border;
+    
+    p {
+      margin-bottom: 15px;
+      color: $dream-text-secondary;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .dream-nft-gallery {
+    padding: 15px;
+    
+    .nft-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
