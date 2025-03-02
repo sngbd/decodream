@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import Markdown from "react-markdown";
 import { useDreams } from "../../context/DreamContext";
 import "../styles/DreamAnalysis.scss";
+import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
 
 const DreamAnalysis = () => {
   const [activeTab, setActiveTab] = useState("analysis");
@@ -222,12 +224,17 @@ const DreamAnalysis = () => {
                   </div>
                 ) :
                 (
-                  <div className="markdown-content" ref={analysisRef}>
+                  <div className="analysis-section" ref={analysisRef}>
                     <h3 className="section-title">
                       <i className="fas fa-brain"></i> Dream Interpretation
                     </h3>
                     <div className="markdown-content">
-                      <Markdown>{currentAnalysis}</Markdown>
+                      <Markdown
+                        remarkPlugins={[remarkGfm]}
+                        rehypePlugins={[rehypeRaw]}
+                      >
+                        {currentAnalysis}
+                      </Markdown>
                     </div>
                   </div>
                 )

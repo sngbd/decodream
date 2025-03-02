@@ -116,8 +116,18 @@ const DreamForm = ({ onAnalysisComplete }) => {
         {
           messages: [
             {
+              role: "system",
+              content: `
+                You are an AI assistant with a deep understanding of dream interpretation and symbolism.
+                Your task is to provide user with insightful and meaningful analyses of the symbols, emotions, and narratives present in their dreams.
+                Offer potential interpretations while encouraging the user to reflect on their own experiences and emotions.
+                Write it down in Markdown format with headings and bullet points.
+                Do not output Chain of Thought.
+              `
+            },
+            {
               role: "user",
-              content: `(Note: Do not show the Chain of Thought) Analyze and interpret this dream in Markdown format with headings and bullet points: ${dreamInput}`
+              content: dreamInput
             }
           ],
           model: "deepseek/deepseek-r1-distill-llama-70b:free",
@@ -133,7 +143,7 @@ const DreamForm = ({ onAnalysisComplete }) => {
       const responseImage = await axios.post(
         `${import.meta.env.VITE_WORKERS_AI || 'http://localhost:3000'}/generate`,
         {
-          prompt: `Generate a photorealistic illustration of the following dream: ${dreamInput}`,
+          prompt: `Dreamy and photorealistic illustration of a dream: ${dreamInput}`,
         },
         {
           headers: {

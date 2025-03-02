@@ -533,11 +533,6 @@ main {
   }
 }
 
-.content-section {
-  padding: 3rem 0;
-  margin-bottom: 2rem;
-}
-
 @include responsive(tablet) {
   .hidden-tablet {
     display: none;

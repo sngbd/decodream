@@ -4,6 +4,8 @@ import Markdown from "react-markdown";
 import { useDreams } from "../../context/DreamContext";
 import "../styles/DreamEntryItem.scss";
 import { decodream_backend as ded } from '../../../../declarations/decodream_backend';
+import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
 
 const DreamEntryItem = ({ entry }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -432,7 +434,12 @@ const DreamEntryItem = ({ entry }) => {
                 <div className="analysis-section">
                   <h4>Analysis</h4>
                   <div className="analysis-content">
-                    <Markdown>{entry.analysis}</Markdown>
+                    <Markdown
+                      remarkPlugins={[remarkGfm]}
+                      rehypePlugins={[rehypeRaw]}
+                    >
+                      {entry.analysis}
+                    </Markdown>
                   </div>
                 </div>
               )}

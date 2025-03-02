@@ -4,6 +4,8 @@ import Markdown from 'react-markdown';
 import Loading from '../common/Loading';
 import { decodream_backend as ded } from '../../../../declarations/decodream_backend';
 import '../styles/SharedDreamView.scss';
+import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
 
 const SharedDreamView = () => {
   const { shareId } = useParams();
@@ -169,7 +171,12 @@ const SharedDreamView = () => {
         
         <h3>Analysis:</h3>
         <div className="markdown-content">
-          <Markdown>{dream.analysis}</Markdown>
+          <Markdown
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeRaw]}
+          >
+            {dream.analysis}
+          </Markdown>
         </div>
       </div>
       
