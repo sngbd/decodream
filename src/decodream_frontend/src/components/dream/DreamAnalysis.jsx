@@ -144,11 +144,15 @@ const DreamAnalysis = () => {
                 {showInsights && (
                   <div id="insights-panel" className="insights-panel">
                     <h4>Key Dream Elements</h4>
-                    <ul>
                       {insights.map((insight, index) => (
-                        <li key={index}>{insight}</li>
+                        <Markdown 
+                          key={index}
+                          remarkPlugins={[remarkGfm]}
+                          rehypePlugins={[rehypeRaw]}
+                        >
+                          {insight}
+                        </Markdown>
                       ))}
-                    </ul>
                   </div>
                 )}
               </div>
