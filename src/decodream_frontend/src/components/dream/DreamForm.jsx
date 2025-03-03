@@ -5,6 +5,7 @@ import { useDreams } from "../../context/DreamContext";
 import ErrorMessage from "../common/ErrorMessage";
 import "../styles/DreamForm.scss";
 import ConfirmDialog from "../common/ConfirmDialog";
+import { decodream_backend as ded } from "../../../../declarations/decodream_backend";
 
 const DreamForm = ({ onAnalysisComplete }) => {
   const [dreamInput, setDreamInput] = useState("");
@@ -111,35 +112,22 @@ const DreamForm = ({ onAnalysisComplete }) => {
     setFormState("analyzing");
 
     try {
+
       const response = await axios.post(
-        "https://openrouter.ai/api/v1/chat/completions",
+        `${import.meta.env.VITE_AI_APIS_WRAPPER || 'https://mushy-fly-decodream-1db853dd.koyeb.app'}/prompt`,
         {
-          messages: [
-            {
-              role: "user",
-              content: 
-              `
-                (Note: Do not show your Chain of Thought)
-                You are an AI assistant with a deep understanding of dream interpretation and symbolism.
-                Your task is to provide me with insightful and meaningful analyses of the symbols, emotions, and narratives present in my dream.
-                Offer potential interpretations while encouraging me to reflect on their own experiences and emotions.
-                Write it down in Markdown format with headings and bullet points.
-                My dream: ${dreamInput}
-              `
-            }
-          ],
-          model: "deepseek/deepseek-r1-distill-llama-70b:free",
+          content: `
+            You are an AI assistant with a deep understanding of dream interpretation and symbolism.
+            Your task is to provide me with insightful and meaningful analyses of the symbols, emotions, and narratives present in my dream.
+            Offer potential interpretations while encouraging me to reflect on their own experiences and emotions.
+            Write it down in Markdown format with headings and bullet points.
+            My dream: ${dreamInput}
+          `
         },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_DEEPSEEK_API_KEY}`,
-          },
-        }
       );
 
       const responseImage = await axios.post(
-        `${import.meta.env.VITE_WORKERS_AI || 'http://localhost:3000'}/generate`,
+        `${import.meta.env.VITE_AI_APIS_WRAPPER || 'https://mushy-fly-decodream-1db853dd.koyeb.app'}/generate`,
         {
           prompt: `Dreamy and photorealistic illustration of a dream: ${dreamInput}`,
         },
@@ -156,11 +144,11 @@ const DreamForm = ({ onAnalysisComplete }) => {
 
       setCurrentImage(responseImage.data.image);
 
-      if (!response.data?.choices?.[0]?.message?.content) {
+      if (!response.data?.output) {
         throw new Error("Invalid API response");
       }
       
-      const analysisContent = response.data.choices[0].message.content;
+      const analysisContent = response.data.output;
       setCurrentAnalysis(analysisContent);
       setCurrentDream(dreamInput);
       

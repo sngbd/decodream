@@ -58,21 +58,10 @@ dfx stop
 - The platform integrates:
   1. **DeepSeek: R1 Distill Llama 70B** ([Docs](https://openrouter.ai/deepseek/deepseek-r1-distill-llama-70b:free)) for dream analysis.
   2. **Stable Diffusion XL-base-1.0** ([Docs](https://developers.cloudflare.com/workers-ai/models/stable-diffusion-xl-base-1.0/)) for dream-based image generation.
-- Environment variables required:
-
-#### Main Application (.env)
-```
-VITE_DEEPSEEK_API_KEY=your-deepseek-api-key-here
-```
-
-#### AI Worker (.env in `src/workers-ai-wrapper`)
-```
-CLOUDFLARE_ACCOUNT_ID=your-cloudflare-account-id-here
-CLOUDFLARE_API_TOKEN=your-cloudflare-api-token-here
-```
+- The code has included the link to the team's own [AI APIs wrapper](https://github.com/sngbd/ai-apis-wrapper), but you could change it to your own API by changing the `VITE_AI_APIS_WRAPPER` environment variable to your URL of deployment.
 
 ## Version History
-* **0.1** - Initial release for Hackathon 11.
+* **0.1** - Initial release for Codefest Hackathon 11.
 
 ## License
 This project is licensed under the DAOist Warriors License - see LICENSE.md for details.
