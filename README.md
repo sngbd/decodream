@@ -1,5 +1,6 @@
 # Decodream
 An IC-blockchain-based platform that transforms dreams into digital art using AI technology.
+
 ![Decodream](docs/homepage.png "Decodream")
 
 ## Description
@@ -41,9 +42,6 @@ cd decodream
 ```bash
 dfx start --clean --background
 dfx deploy
-cd src/workers-ai-wrapper
-sudo chmod +x run.sh
-./run.sh
 ```
 
 The frontend will be available at: http://[frontend-canister-id].localhost:4943
