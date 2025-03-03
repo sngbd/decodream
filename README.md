@@ -1,59 +1,79 @@
-# `decodream`
+# Decodream
+An IC-blockchain-based platform that transforms dreams into digital art using AI technology.
+![Decodream](docs/homepage.png "Decodream")
 
-Welcome to your new `decodream` project and to the Internet Computer development community. By default, creating a new project adds this README and some template files to your project directory. You can edit these template files to customize your project and to include your own code to speed up the development cycle.
+## Description
+Decodream reimagines how dreams are explored and expressed through digital art and blockchain technology. Users can submit their dreams, receive AI-driven interpretations, and transform them into unique digital artworks. Built on the Internet Computer blockchain, Decodream ensures privacy and security for all user data.
 
-To get started, you might want to explore the project directory structure and the default configuration file. Working with this project in your development environment will not affect any production deployment or identity tokens.
+### Key Features:
+1. **Dream Interpretation** - Users submit dream descriptions that are analyzed by an AI interpretation engine.
+   * **Semantic Analysis** - Extracts key themes and emotions.
+   * **Personalized Insights** - Provides meaningful interpretations.
+2. **AI Image Generation** - Dream interpretations are converted into digital artwork.
+3. **NFT Minting & Dream Sharing**
+   * Users can mint dream-inspired artwork as NFTs.
+   * Option to share dream entries publicly or keep them private
+   * Create a personal public NFT gallery or keep a private collection.
 
-To learn more before you start working with `decodream`, see the following documentation available online:
+## Made by DAOist Warriors Team
+1. **Kimsang Silalahi** - Visionary Team Leader
+2. **Gilberdi Sinaga** - Web3 & AI Orchestrator
+3. **Haikal Rahman** - Immersive UI/UX Artisan
 
-- [Quick Start](https://internetcomputer.org/docs/current/developer-docs/setup/deploy-locally)
-- [SDK Developer Tools](https://internetcomputer.org/docs/current/developer-docs/setup/install)
-- [Motoko Programming Language Guide](https://internetcomputer.org/docs/current/motoko/main/motoko)
-- [Motoko Language Quick Reference](https://internetcomputer.org/docs/current/motoko/main/language-manual)
+## Getting Started
 
-If you want to start working on your project right away, you might want to try the following commands:
+### Dependencies
+- [NodeJS 20+](https://nodejs.org/en/download/)
+- [Internet Computer dfx CLI](https://internetcomputer.org/docs/current/developer-docs/setup/install/)
+- [Visual Studio Code](https://code.visualstudio.com/Download) (recommended)
 
 ```bash
-cd decodream/
-dfx help
-dfx canister --help
+sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
 ```
 
-## Running the project locally
-
-If you want to test your project locally, you can use the following commands:
-
+### Installation
 ```bash
-# Starts the replica, running in the background
-dfx start --background
+git clone https://github.com/sngbd/decodream
+cd decodream
+```
 
-# Deploys your canisters to the replica and generates your candid interface
+### Running the Application
+```bash
+dfx start --clean --background
 dfx deploy
+cd src/workers-ai-wrapper
+sudo chmod +x run.sh
+./run.sh
 ```
 
-Once the job completes, your application will be available at `http://localhost:4943?canisterId={asset_canister_id}`.
+The frontend will be available at: http://[frontend-canister-id].localhost:4943
 
-If you have made changes to your backend canister, you can generate a new candid interface with
-
+### Stopping the Server
 ```bash
-npm run generate
+dfx stop
 ```
 
-at any time. This is recommended before starting the frontend development server, and will be run automatically any time you run `dfx deploy`.
+## Notes
+- Decodream is built on the Internet Computer (IC) blockchain for privacy and security.
+- The platform integrates:
+  1. **DeepSeek: R1 Distill Llama 70B** ([Docs](https://openrouter.ai/deepseek/deepseek-r1-distill-llama-70b:free)) for dream analysis.
+  2. **Stable Diffusion XL-base-1.0** ([Docs](https://developers.cloudflare.com/workers-ai/models/stable-diffusion-xl-base-1.0/)) for dream-based image generation.
+- Environment variables required:
 
-If you are making frontend changes, you can start a development server with
-
-```bash
-npm start
+#### Main Application (.env)
+```
+VITE_DEEPSEEK_API_KEY=your-deepseek-api-key-here
 ```
 
-Which will start a server at `http://localhost:8080`, proxying API requests to the replica at port 4943.
+#### AI Worker (.env in `src/workers-ai-wrapper`)
+```
+CLOUDFLARE_ACCOUNT_ID=your-cloudflare-account-id-here
+CLOUDFLARE_API_TOKEN=your-cloudflare-api-token-here
+```
 
-### Note on frontend environment variables
+## Version History
+* **0.1** - Initial release for Hackathon 11.
 
-If you are hosting frontend code somewhere without using DFX, you may need to make one of the following adjustments to ensure your project does not fetch the root key in production:
+## License
+This project is licensed under the DAOist Warriors License - see LICENSE.md for details.
 
-- set`DFX_NETWORK` to `ic` if you are using Webpack
-- use your own preferred method to replace `process.env.DFX_NETWORK` in the autogenerated declarations
-  - Setting `canisters -> {asset_canister_id} -> declarations -> env_override to a string` in `dfx.json` will replace `process.env.DFX_NETWORK` with the string in the autogenerated declarations
-- Write your own `createActor` constructor
