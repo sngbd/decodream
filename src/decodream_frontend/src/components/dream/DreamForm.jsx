@@ -116,18 +116,16 @@ const DreamForm = ({ onAnalysisComplete }) => {
         {
           messages: [
             {
-              role: "system",
-              content: `
-                You are an AI assistant with a deep understanding of dream interpretation and symbolism.
-                Your task is to provide user with insightful and meaningful analyses of the symbols, emotions, and narratives present in their dreams.
-                Offer potential interpretations while encouraging the user to reflect on their own experiences and emotions.
-                Write it down in Markdown format with headings and bullet points.
-                Do not output Chain of Thought.
-              `
-            },
-            {
               role: "user",
-              content: dreamInput
+              content: 
+              `
+                (Note: Do not show your Chain of Thought)
+                You are an AI assistant with a deep understanding of dream interpretation and symbolism.
+                Your task is to provide me with insightful and meaningful analyses of the symbols, emotions, and narratives present in my dream.
+                Offer potential interpretations while encouraging me to reflect on their own experiences and emotions.
+                Write it down in Markdown format with headings and bullet points.
+                My dream: ${dreamInput}
+              `
             }
           ],
           model: "deepseek/deepseek-r1-distill-llama-70b:free",
