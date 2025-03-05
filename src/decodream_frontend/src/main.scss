@@ -1,4 +1,5 @@
-@import 'variables';
+@use "sass:color";
+@use './variables' as *;
 
 * {
   margin: 0;
@@ -233,20 +234,20 @@ a {
   }
   
   &.btn-success {
-    background: linear-gradient(135deg, darken($dream-success, 20%), $dream-success);
+    background: linear-gradient(135deg, color.adjust($dream-success, $lightness: -20%), $dream-success);
     border-color: $dream-success;
     
     &:hover {
-      background: linear-gradient(135deg, $dream-success, lighten($dream-success, 10%));
+      background: linear-gradient(135deg, $dream-success, color.adjust($dream-success, $lightness: 10%));
     }
   }
   
   &.btn-danger {
-    background: linear-gradient(135deg, darken($dream-danger, 10%), $dream-danger);
+    background: linear-gradient(135deg, color.adjust($dream-danger, $lightness: -10%), $dream-danger);
     border-color: $dream-danger;
     
     &:hover {
-      background: linear-gradient(135deg, $dream-danger, lighten($dream-danger, 10%));
+      background: linear-gradient(135deg, $dream-danger, color.adjust($dream-danger, $lightness: 10%));
     }
   }
   

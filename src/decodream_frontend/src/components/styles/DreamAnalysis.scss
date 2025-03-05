@@ -1,4 +1,5 @@
-@import '../../variables';
+@use "sass:color";
+@use '../../variables' as *;
 
 .dream-analysis {
   @include dream-panel;
@@ -227,12 +228,12 @@
             padding: 1px 3px;
             border-radius: 3px;
             font-size: 0.85rem;
-            color: lighten($dream-text-primary, 5%);
+            color: color.adjust($dream-text-primary, $lightness: 5%);
             font-family: $font-mono;
           }
           
           strong {
-            color: lighten($dream-text-primary, 15%);
+            color: color.adjust($dream-text-primary, $lightness: 15%);
             font-weight: 600;
           }
           
@@ -547,7 +548,7 @@
       }
       
       strong {
-        color: lighten($dream-text-primary, 10%);
+        color: color.adjust($dream-text-primary, $lightness: 10%);
       }
     }
   }

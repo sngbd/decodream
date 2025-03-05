@@ -7,6 +7,48 @@
   <title>Decodream</title>
   <base href="/" />
   <link rel="icon" href="/decodream.ico" />
+
+  <style>
+    html, body {
+      background-color: #060218;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    
+    #app-preloader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #060218;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.3s ease-out;
+    }
+    
+    .loader {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(138, 43, 226, 0.3);
+      border-radius: 50%;
+      border-top-color: #8a2be2;
+      animation: spin 1s infinite linear;
+      margin-bottom: 20px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .browser-warning {
+      display: none;
+    }
+  </style>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Rajdhani:wght@300;400;500;600&family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
@@ -17,6 +59,7 @@
     Firefox are recommended.
   </div>
   <div id="root"></div>
+
   <script type="module" src="src/main.jsx"></script>
 </body>
 

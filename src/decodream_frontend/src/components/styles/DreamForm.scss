@@ -1,4 +1,5 @@
-@import '../../variables';
+@use "sass:color";
+@use '../../variables' as *;
 
 .dream-form-container {
   @include dream-panel;
@@ -238,7 +239,7 @@
         }
         
         &.analyzing {
-          background: linear-gradient(135deg, darken($dream-primary, 10%), darken($dream-secondary, 10%));
+          background: linear-gradient(135deg, color.adjust($dream-primary, $lightness: -10%), color.adjust($dream-secondary, $lightness: -10%));
           
           .spinner {
             width: 18px;

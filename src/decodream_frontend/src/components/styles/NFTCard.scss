@@ -1,4 +1,4 @@
-@import '../../variables';
+@use '../../variables' as *;
 
 .nft-card {
   background: rgba(15, 5, 36, 0.8);

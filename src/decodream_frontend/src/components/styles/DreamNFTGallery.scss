@@ -1,4 +1,5 @@
-@import '../../variables';
+@use "sass:color";
+@use '../../variables' as *;
 
 .dream-nft-gallery {
   @include dream-panel;
@@ -249,7 +250,7 @@
 .dream-button.danger-button {
   background: rgba($dream-danger, 0.2);
   border: 1px solid rgba($dream-danger, 0.5);
-  color: lighten($dream-danger, 15%);
+  color: color.adjust($dream-danger, $lightness: 15%);
   
   &:hover:not(:disabled) {
     background: rgba($dream-danger, 0.3);
