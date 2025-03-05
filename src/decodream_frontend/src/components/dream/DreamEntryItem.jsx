@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import Markdown from "react-markdown";
 import { useDreams } from "../../context/DreamContext";
 import "../styles/DreamEntryItem.scss";
-import { decodream_backend as ded } from '../../../../declarations/decodream_backend';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
 
@@ -12,7 +11,18 @@ const DreamEntryItem = ({ entry }) => {
   const [isExpanding, setIsExpanding] = useState(false);
   const [isCollapsing, setIsCollapsing] = useState(false);
   const [contentHeight, setContentHeight] = useState("0px");
-  const { selectDreamForEditing, setDreamToDelete, setIsAnalyzed, setActiveTab } = useDreams();
+  const {
+    selectDreamForEditing,
+    setDreamToDelete,
+    setIsAnalyzed,
+    setActiveTab,
+    isDreamShared,
+    isDreamMinted,
+    revokeDreamShare,
+    createShareableLink,
+    mintDreamNFT,
+    burnDreamNFT,
+  } = useDreams();
   const [isSharing, setIsSharing] = useState(false);
   const [shareLink, setShareLink] = useState('');
   const [shareError, setShareError] = useState('');
@@ -38,8 +48,8 @@ const DreamEntryItem = ({ entry }) => {
         const timestampForMint = parseInt(entry.timestamp, 10);
         
         const [isShared, isMinted] = await Promise.all([
-          ded.isDreamShared(entry.user, timestampForShare),
-          ded.isDreamMinted(entry.user, timestampForMint)
+          isDreamShared(entry.user, timestampForShare),
+          isDreamMinted(entry.user, timestampForMint)
         ]);
         
         setIsCurrentlyShared(isShared);
@@ -60,7 +70,7 @@ const DreamEntryItem = ({ entry }) => {
         setIsUnsharing(true);
         setShareError('');
         
-        const result = await ded.revokeDreamShare(entry.user, entry.timestamp);
+        const result = await revokeDreamShare(entry.user, entry.timestamp);
         
         if (result) {
           setIsCurrentlyShared(false);
@@ -80,7 +90,7 @@ const DreamEntryItem = ({ entry }) => {
         setShareError('');
         setShareLink('');
         
-        const result = await ded.createShareableLink(entry.user, entry.timestamp);
+        const result = await createShareableLink(entry.user, entry.timestamp);
         
         if (result.length === 0) {
           setShareError('Could not create share link. Please try again.');
@@ -97,7 +107,6 @@ const DreamEntryItem = ({ entry }) => {
           setClipboardStatus('Copied to clipboard!');
           setTimeout(() => setClipboardStatus(''), 2000);
         } catch (clipboardError) {
-          console.log('Auto-copy failed, user may need to copy manually', clipboardError);
           setClipboardStatus('Click to copy');
         }
       } catch (error) {
@@ -119,7 +128,7 @@ const DreamEntryItem = ({ entry }) => {
         
         const timestampInt = parseInt(entry.timestamp, 10);
         
-        const result = await ded.burnDreamNFT(entry.user, timestampInt);
+        const result = await burnDreamNFT(entry.user, timestampInt);
         
         if (result) {
           setIsMinted(false);
@@ -141,7 +150,7 @@ const DreamEntryItem = ({ entry }) => {
         const timestampInt = parseInt(entry.timestamp, 10);
         const dateStr = new Date(Number(entry.timestamp)).toLocaleDateString();
         
-        const result = await ded.mintDreamNFT(
+        const result = await mintDreamNFT(
           entry.user,
           timestampInt,
           `Dream visualization from ${dateStr}`
@@ -200,7 +209,7 @@ const DreamEntryItem = ({ entry }) => {
           if (rect.top < 80 || rect.bottom > window.innerHeight) {
             entryRef.current.scrollIntoView({ 
               behavior: 'smooth', 
-              block: 'center'
+              block: 'start'
             });
           }
         }

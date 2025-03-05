@@ -3,7 +3,7 @@ import { decodream_backend as ded } from "../../../declarations/decodream_backen
 import { useAuth } from "./AuthContext";
 
 const DreamContext = createContext({
-  activeTab: 'history',
+  activeTab: 'write',
   setActiveTab: () => {},
 });
 
@@ -126,6 +126,116 @@ export const DreamProvider = ({ children }) => {
     }
   };
 
+  const isDreamShared = async (principalId, timestamp) => {
+    try {
+      return await ded.isDreamShared(principalId, timestamp);
+    } catch (err) {
+      console.error("Error checking shared entry:", err);
+      setError("Failed to check shared dream entry");
+      return false;
+    }
+  };
+
+  const isDreamMinted = async (principalId, timestamp) => {
+    try {
+      return await ded.isDreamMinted(principalId, timestamp);
+    } catch (err) {
+      console.error("Error checking minted entry:", err);
+      setError("Failed to check minted dream entry");
+      return false;
+    }
+  };
+
+  const revokeDreamShare = async (principalId, timestamp) => {
+    try {
+      return await ded.revokeDreamShare(principalId, timestamp);
+    } catch (err) {
+      console.error("Error revoke dream entry:", err);
+      setError("Failed to revoke shared dream entry");
+      return false;
+    }
+  };
+
+  const createShareableLink = async (principalId, timestamp) => {
+    try {
+      return await ded.createShareableLink(principalId, timestamp);
+    } catch (err) {
+      console.error("Error create shareable link:", err);
+      setError("Failed to create shareable link");
+      return [];
+    }
+  };
+
+  const mintDreamNFT = async (principalId, timestamp, description) => {
+    try {
+      return await ded.mintDreamNFT(principalId, timestamp, description);
+    } catch (err) {
+      console.error("Error mint nft:", err);
+      setError("Failed to mint nft");
+      return null;
+    }
+  };
+
+  const burnDreamNFT = async (principalId, timestamp) => {
+    try {
+      return await ded.burnDreamNFT(principalId, timestamp);
+    } catch (err) {
+      console.error("Error burn nft:", err);
+      setError("Failed to burn nft");
+      return false;
+    }
+  };
+
+  const isGalleryPublic = async (principalId) => {
+    try {
+      return await ded.isGalleryPublic(principalId);
+    } catch (err) {
+      console.error("Error burn nft:", err);
+      setError("Failed to burn nft");
+      return "";
+    }
+  };
+
+  const getMyDreamNFTs = async (principalId) => {
+    try {
+      return await ded.getMyDreamNFTs(principalId);
+    } catch (err) {
+      console.error("Error get nfts:", err);
+      setError("Failed to get nfts");
+      return [];
+    }
+  };
+
+  const toggleGallerySharing = async (principalId, isPublic) => {
+    try {
+      return await ded.toggleGallerySharing(principalId, isPublic);
+    } catch (err) {
+      console.error("Error toggle gallery sharing:", err);
+      setError("Failed to toggle gallery sharing");
+      return false;
+    }
+  };
+
+  const getPublicGallery = async (principalId) => {
+    try {
+      return await ded.getPublicGallery(principalId);
+    } catch (err) {
+      console.error("Error get public gallery:", err);
+      setError("Failed to get public gallery");
+      return [];
+    }
+  };
+
+  const getSharedDream = async (shareId) => {
+    try {
+      return await ded.getSharedDream(shareId);
+    } catch (err) {
+      console.error("Error get shared dream:", err);
+      setError("Failed to get shared dream");
+      return null;
+    }
+  };
+
   const selectDreamForEditing = (entry) => {
     setCurrentDream(entry.dreamText);
     setCurrentAnalysis(entry.analysis);
@@ -176,6 +286,17 @@ export const DreamProvider = ({ children }) => {
     addDreamEntry,
     updateDreamEntry,
     deleteDreamEntry,
+    isDreamShared,
+    isDreamMinted,
+    revokeDreamShare,
+    createShareableLink,
+    mintDreamNFT,
+    burnDreamNFT,
+    isGalleryPublic,
+    getMyDreamNFTs,
+    getPublicGallery,
+    toggleGallerySharing,
+    getSharedDream,
     selectDreamForEditing,
     resetCurrentDream,
     dreamToDelete,

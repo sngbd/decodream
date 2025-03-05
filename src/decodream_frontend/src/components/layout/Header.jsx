@@ -38,12 +38,20 @@ const Header = () => {
   }, [mobileMenuOpen]);
 
   useEffect(() => {
+    let lastScrollTop = 0;
+    const scrollUpThreshold = 50;
+    const scrollDownThreshold = 80;
+
     const handleScroll = () => {
-      if (window.scrollY > 20) {
+      const currentScrollTop = window.scrollY || document.documentElement.scrollTop;
+      
+      if (currentScrollTop > scrollDownThreshold) {
         setScrolled(true);
-      } else {
+      } else if (currentScrollTop < scrollUpThreshold) {
         setScrolled(false);
       }
+      
+      lastScrollTop = currentScrollTop;
     };
 
     window.addEventListener('scroll', handleScroll);

@@ -5,11 +5,10 @@ import { useAuth } from "../../context/AuthContext";
 import { useDreams } from "../../context/DreamContext";
 import Loading from "../common/Loading";
 import "../styles/DreamEntryList.scss";
-import { decodream_backend as ded } from "../../../../declarations/decodream_backend";
 
 const DreamEntryList = ({ onWriteDreamClick }) => {
   const { isLoggedIn } = useAuth();
-  const { dreamEntries, loading, searchQuery } = useDreams();
+  const { dreamEntries, loading, searchQuery, isDreamShared, isDreamMinted } = useDreams();
   const [sortOrder, setSortOrder] = useState("newest");
   const [filterType, setFilterType] = useState("all");
   const [animateEntries, setAnimateEntries] = useState(false);
@@ -40,8 +39,8 @@ const DreamEntryList = ({ onWriteDreamClick }) => {
                 
               try {
                 const [isShared, isMinted] = await Promise.all([
-                  ded.isDreamShared(entry.user, timestamp),
-                  ded.isDreamMinted(entry.user, timestamp)
+                  isDreamShared(entry.user, timestamp),
+                  isDreamMinted(entry.user, timestamp)
                 ]);
                 
                 return {

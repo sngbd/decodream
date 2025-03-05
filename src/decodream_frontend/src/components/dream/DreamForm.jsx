@@ -5,7 +5,6 @@ import { useDreams } from "../../context/DreamContext";
 import ErrorMessage from "../common/ErrorMessage";
 import "../styles/DreamForm.scss";
 import ConfirmDialog from "../common/ConfirmDialog";
-import { decodream_backend as ded } from "../../../../declarations/decodream_backend";
 
 const DreamForm = ({ onAnalysisComplete }) => {
   const [dreamInput, setDreamInput] = useState("");

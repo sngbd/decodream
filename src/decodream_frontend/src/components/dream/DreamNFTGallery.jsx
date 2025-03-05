@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { decodream_backend as ded } from '../../../../declarations/decodream_backend';
+import { useDreams } from "../../context/DreamContext";
 import Loading from '../common/Loading';
 import NFTCard from './NFTCard';
 import '../styles/DreamNFTGallery.scss';
@@ -10,6 +10,12 @@ import { toast } from 'react-toastify';
 const DreamNFTGallery = () => {
   const { identity, getPrincipal } = useAuth();
   const { principalId } = useParams();
+  const {
+    isGalleryPublic,
+    getMyDreamNFTs,
+    getPublicGallery,
+    toggleGallerySharing,
+  } = useDreams();
   const navigate = useNavigate();
 
   const [nfts, setNfts] = useState([]);
@@ -17,7 +23,6 @@ const DreamNFTGallery = () => {
   const [sharingLoading, setSharingLoading] = useState(false);
   const [error, setError] = useState('');
   const [isPublic, setIsPublic] = useState(false);
-  const [ownerName, setOwnerName] = useState('');
   const [copySuccess, setCopySuccess] = useState('');
 
   const isOwnGallery = !principalId || principalId === getPrincipal();
@@ -31,28 +36,20 @@ const DreamNFTGallery = () => {
         setLoading(true);
         
         if (!isOwnGallery) {
-          const galleryIsPublic = await ded.isGalleryPublic(principalId);
+          const galleryIsPublic = await isGalleryPublic(principalId);
           if (!galleryIsPublic) {
             setError('This gallery is private or does not exist.');
             setLoading(false);
             return;
           }
-          
-          try {
-            const profileInfo = await ded.getProfileInfo(principalId);
-            if (profileInfo && profileInfo.username) {
-              setOwnerName(profileInfo.username);
-            }
-          } catch (e) {
-          }
         } else {
-          const galleryIsPublic = await ded.isGalleryPublic(getPrincipal());
+          const galleryIsPublic = await isGalleryPublic(getPrincipal());
           setIsPublic(galleryIsPublic);
         }
         
         const nftData = isOwnGallery 
-          ? await ded.getMyDreamNFTs(getPrincipal())
-          : await ded.getPublicGallery(currentPrincipal);
+          ? await getMyDreamNFTs(getPrincipal())
+          : await getPublicGallery(currentPrincipal);
         
         setNfts(nftData || []);
       } catch (err) {
@@ -73,7 +70,7 @@ const DreamNFTGallery = () => {
       setSharingLoading(true);
       const newStatus = !isPublic;
       
-      const success = await ded.toggleGallerySharing(getPrincipal(), newStatus);
+      const success = await toggleGallerySharing(getPrincipal(), newStatus);
       
       if (success) {
         setIsPublic(newStatus);
@@ -176,7 +173,7 @@ const DreamNFTGallery = () => {
             </>
           ) : (
             <>
-              <p>{ownerName || "This user"} hasn't minted any Dream NFTs yet.</p>
+              <p>This user hasn't minted any Dream NFTs yet.</p>
               <button className="dream-button" onClick={() => navigate('/nft-gallery')}>
                 View My Gallery
               </button>
@@ -190,8 +187,7 @@ const DreamNFTGallery = () => {
   return (
     <div className="dream-nft-gallery">
       <div className="gallery-header">
-        <h2>{isOwnGallery ? 'Your Dream NFT Collection' : 
-            ownerName ? `${ownerName}'s Dream NFTs` : 'Shared NFT Gallery'}</h2>
+        <h2>{isOwnGallery ? 'Your Dream NFT Collection' : 'Shared NFT Gallery'}</h2>
         
         {isOwnGallery && (
           <div className="gallery-controls">

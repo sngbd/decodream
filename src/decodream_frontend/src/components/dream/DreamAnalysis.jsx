@@ -33,7 +33,7 @@ const DreamAnalysis = () => {
     if (showInsights) {
       setTimeout(() => {
         if (imageRef.current) {
-          imageRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          imageRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       }, 300);
     }

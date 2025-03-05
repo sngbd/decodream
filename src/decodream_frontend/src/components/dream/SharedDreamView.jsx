@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { useDreams } from "../../context/DreamContext";
 import Markdown from 'react-markdown';
 import Loading from '../common/Loading';
-import { decodream_backend as ded } from '../../../../declarations/decodream_backend';
 import '../styles/SharedDreamView.scss';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
 
 const SharedDreamView = () => {
   const { shareId } = useParams();
+  const { getSharedDream } = useDreams();
+
   const [dream, setDream] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -17,7 +19,7 @@ const SharedDreamView = () => {
     const fetchSharedDream = async () => {
       try {
         setLoading(true);
-        const result = await ded.getSharedDream(shareId);
+        const result = await getSharedDream(shareId);
         
         if (result.length === 0) {
           setError('This shared dream does not exist or has been removed.');
