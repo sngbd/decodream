@@ -22,6 +22,7 @@ const DreamEntryItem = ({ entry }) => {
     createShareableLink,
     mintDreamNFT,
     burnDreamNFT,
+    editingEntry
   } = useDreams();
   const [isSharing, setIsSharing] = useState(false);
   const [shareLink, setShareLink] = useState('');
@@ -491,7 +492,8 @@ const DreamEntryItem = ({ entry }) => {
                       onClick={handleMintNFT}
                       className={`dream-button ${isMinted ? 'burn-button' : 'mint-button'}`}
                       aria-label={isMinted ? "Burn this NFT" : "Mint as NFT"}
-                      disabled={isMinting || isBurning}
+                      disabled={isMinting || isBurning | editingEntry != null }
+                      title={editingEntry != null ? "Cannot mint NFT while dream is being edited" : ""}
                     >
                       <i className={`fas ${isMinted ? 'fa-fire' : 'fa-gem'}`}></i>
                       <span>
