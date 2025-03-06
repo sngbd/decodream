@@ -46,16 +46,18 @@ const DreamEntryItem = ({ entry }) => {
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        const timestampForShare = parseInt(entry.timestamp, 10);
-        const timestampForMint = parseInt(entry.timestamp, 10);
+        const timestamp = parseInt(entry.timestamp, 10);
         
-        const [isShared, isMinted] = await Promise.all([
-          isDreamShared(entry.user, timestampForShare),
-          isDreamMinted(entry.user, timestampForMint)
-        ]);
-        
+        const isShared = await isDreamShared(entry.user, timestamp);
         setIsCurrentlyShared(isShared);
-        setIsMinted(isMinted);
+        
+        try {
+          const mintStatus = await isDreamMinted(entry.user, timestamp);
+          setIsMinted(mintStatus);
+        } catch (mintError) {
+          console.error("Error checking mint status:", mintError);
+          setIsMinted(false);
+        }
       } catch (error) {
         console.error("Error checking dream status:", error);
       }
