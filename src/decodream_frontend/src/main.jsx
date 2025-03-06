@@ -11,3 +11,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </InternetIdentityProvider>
   </React.StrictMode>,
 );
+
+if ('scrollRestoration' in window.history) {
+  window.history.scrollRestoration = 'manual';
+}

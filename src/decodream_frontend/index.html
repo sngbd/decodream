@@ -60,7 +60,15 @@
   </div>
   <div id="root"></div>
 
-  <script type="module" src="src/main.jsx"></script>
+  <script type="module" src="src/main.jsx">
+    document.addEventListener('DOMContentLoaded', () => {
+      window.scrollTo(0, 0);
+      
+      if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+      }
+    });
+  </script>
 </body>
 
 </html>

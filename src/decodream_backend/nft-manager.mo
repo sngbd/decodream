@@ -265,56 +265,6 @@ module {
       return #Err(#Unauthorized);
     };
     
-    private var stableTokens : [Types.DreamNFT] = [];
-    private var stableMintedDreams : [(Text, Int)] = [];
-    
-    public func preupgrade() {
-      let tokenArr = Buffer.Buffer<Types.DreamNFT>(tokens.size());
-      for ((_, token) in tokens.entries()) {
-        tokenArr.add(token);
-      };
-      stableTokens := Buffer.toArray(tokenArr);
-      
-      let mintedDreamEntries = Iter.toArray(mintedDreams.entries());
-      stableMintedDreams := Array.map<(Text, Int), (Text, Int)>(
-        mintedDreamEntries,
-        func ((key, timestamp)) : (Text, Int) {
-          let parts = Text.split(key, #char(':'));
-          let userId = switch(parts.next()) {
-            case (?id) { id };
-            case (null) { "" };
-          };
-          (userId, timestamp)
-        }
-      );
-    };
-    
-    public func postupgrade() {
-      tokens := HashMap.HashMap<Nat, Types.DreamNFT>(stableTokens.size(), Nat.equal, natHash);
-      ownedTokens := HashMap.HashMap<Principal, Buffer.Buffer<Nat>>(10, Principal.equal, Principal.hash);
-      
-      for (token in stableTokens.vals()) {
-        tokens.put(token.tokenId, token);
-        
-        switch (ownedTokens.get(token.owner)) {
-          case (null) {
-            let newBuffer = Buffer.Buffer<Nat>(1);
-            newBuffer.add(token.tokenId);
-            ownedTokens.put(token.owner, newBuffer);
-          };
-          case (?buffer) {
-            buffer.add(token.tokenId);
-          };
-        };
-      };
-      
-      mintedDreams := HashMap.HashMap<Text, Int>(10, Text.equal, Text.hash);
-      for ((userId, timestamp) in stableMintedDreams.vals()) {
-        let key = userId # ":" # Int.toText(timestamp);
-        mintedDreams.put(key, timestamp);
-      };
-    };
-
     public func getUserDreamNFTs(user : Text) : [Types.DreamNFT] {
       switch (ownedTokens.get(Principal.fromText(user))) {
         case (null) { return [] };

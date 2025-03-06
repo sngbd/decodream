@@ -10,18 +10,6 @@ module {
       initialGalleries.vals(), 10, Text.equal, Text.hash
     );
 
-    private var publicGalleries : [(Text, Bool)] = [];
-
-    public func preupgrade() {
-      publicGalleries := Iter.toArray(galleryStatus.entries());
-    };
-
-    public func postupgrade() {
-      galleryStatus := HashMap.fromIter<Text, Bool>(
-        publicGalleries.vals(), 10, Text.equal, Text.hash
-      );
-    };
-
     public func toggleGallerySharing(principal : Text, isPublic : Bool) : Bool {
       galleryStatus.put(principal, isPublic);
       return true;

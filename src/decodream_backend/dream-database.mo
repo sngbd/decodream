@@ -2,25 +2,19 @@ import Types "./types";
 import Text "mo:base/Text";
 import Int "mo:base/Int";
 import Array "mo:base/Array";
-import HashMap "mo:base/HashMap";
-import Iter "mo:base/Iter";
 
 module {
-  public class DreamDatabase(initialEntries : [(Text, [Types.DreamEntry])]) {
-    private var userEntries = HashMap.fromIter<Text, [Types.DreamEntry]>(
-      initialEntries.vals(), 10, Text.equal, Text.hash
-    );
-    private var entries : [Types.DreamEntry] = [];
+  public class DreamDatabase(initialEntries : [Types.DreamEntry]) {
+    private var entries : [Types.DreamEntry] = initialEntries;
     
     public func addEntry(entry : Types.DreamEntry) {
       entries := Array.append(entries, [entry]);
     };
     
     public func getEntriesByUser(userPrincipal : Text) : [Types.DreamEntry] {
-      let userEntries = Array.filter<Types.DreamEntry>(
-        entries, func(entry) : Bool { entry.user == userPrincipal }
-      );
-      return userEntries;
+      Array.filter<Types.DreamEntry>(entries, func(entry) {
+        entry.user == userPrincipal
+      });
     };
     
     public func getEntryByTimestamp(user : Text, timestamp : Int) : ?Types.DreamEntry {
@@ -74,22 +68,12 @@ module {
       return initialSize > entries.size();
     };
     
-    public func getAllEntries() : [(Text, [Types.DreamEntry])] {
-      Iter.toArray(userEntries.entries())
+    public func getAllEntries() : [Types.DreamEntry] {
+      return entries;
     };
     
     public func populateFromEntries(savedEntries : [Types.DreamEntry]) {
       entries := savedEntries;
-    };
-    
-    private var stableEntries : [Types.DreamEntry] = [];
-    
-    public func preupgrade() {
-      stableEntries := entries;
-    };
-    
-    public func postupgrade() {
-      entries := stableEntries;
     };
   };
 }

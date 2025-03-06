@@ -5,8 +5,8 @@ import GalleryManager "./gallery-manager";
 import Types "./types";
 
 actor Decodream {
-  stable var dreamEntries : [(Text, [Types.DreamEntry])] = [];
-  stable var dreamShares : [(Text, [(Text, Types.ShareableDreamEntry)])] = [];
+  stable var dreamEntries : [Types.DreamEntry] = [];
+  stable var dreamShares : [Types.ShareableDreamEntry] = [];
   stable var nftData : {
     tokens : [(Nat, Types.DreamNFT)];
     ownedTokens : [(Text, [Nat])];
@@ -62,24 +62,16 @@ actor Decodream {
     shareManager.isDreamShared(userId, timestamp)
   };
   
-  public shared func createShareableLink(userId : Text, timestamp : Int) : async [Text] {
-    shareManager.createShareableLink(userId, timestamp)
+  public shared func createShareableLink(userId : Text, timestamp : Int) : async Text {
+    await shareManager.createShareableLink(userId, timestamp);
   };
   
   public shared func revokeDreamShare(userId : Text, timestamp : Int) : async Bool {
     shareManager.revokeDreamShare(userId, timestamp)
   };
   
-  public query func getSharedDream(shareId : Text) : async ?Types.ShareableDreamEntry {
+  public query func getSharedDream(shareId : Text) : async ?Types.DreamEntry {
     shareManager.getSharedDream(shareId)
-  };
-  
-  public query func getShareLinksForUser(user : Text) : async [(Text, Types.ShareableDreamEntry)] {
-    shareManager.getShareLinksForUser(user)
-  };
-  
-  public func deleteShareLink(user : Text, shareId : Text) : async Bool {
-    shareManager.deleteShareLink(user, shareId)
   };
   
   public shared func isDreamMinted(userId : Text, timestamp : Int) : async Bool {
@@ -155,14 +147,9 @@ actor Decodream {
   };
   
   system func postupgrade() {
-    db := DreamDatabase.DreamDatabase(dreamEntries);
-    shareManager := ShareManager.ShareManager(db, dreamShares);
+    db.populateFromEntries(dreamEntries);
+    shareManager.populateFromShares(dreamShares);
     nftManager := NFTManager.NFTManager(db, nftData);
     galleryManager := GalleryManager.GalleryManager(galleriesShared, nftManager);
-    
-    db.postupgrade();
-    shareManager.postupgrade();
-    nftManager.postupgrade();
-    galleryManager.postupgrade();
   };
 }

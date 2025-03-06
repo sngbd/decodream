@@ -522,6 +522,7 @@
     
     .clipboard-status {
       margin-left: auto;
+      margin-right: 1rem;
       font-size: 0.8rem;
       color: $dream-text-secondary;
     }
@@ -796,6 +797,21 @@
       filter: drop-shadow(0 0 5px rgba($dream-accent, 0.7));
     }
   }
+}
+
+.share-actions {
+  display: flex;
+  gap: 8px;
+  
+  .dream-button {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.primary-actions {
+  display: flex;
+  gap: 10px;
 }
 
 @keyframes fadeIn {

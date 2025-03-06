@@ -15,6 +15,7 @@
     "@dfinity/auth-client": "^2.3.0",
     "@dfinity/candid": "^2.3.0",
     "@dfinity/principal": "^2.3.0",
+    "@studio-freight/lenis": "^1.0.42",
     "axios": "^1.8.1",
     "ic-use-internet-identity": "^0.2.0",
     "react": "^19.0.0",

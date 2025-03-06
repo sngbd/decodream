@@ -12,15 +12,11 @@ module {
   };
   
   public type ShareableDreamEntry = {
-    originalUser : Text;
-    originalTimestamp : Int;
-    dreamText : Text;
-    analysis : Text;
-    created : Int;
-    updated : Int;
-    imageData : Text;
+    user: Text;
+    timestamp: Int;
+    shareId: Text;
   };
-  
+
   public type AttributeValue = {
     #text : Text;
     #int : Int;

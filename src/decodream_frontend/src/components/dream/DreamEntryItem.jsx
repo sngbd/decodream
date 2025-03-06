@@ -5,6 +5,7 @@ import { useDreams } from "../../context/DreamContext";
 import "../styles/DreamEntryItem.scss";
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
+import { scrollTo, scrollToTop } from "../common/Scrolls";
 
 const DreamEntryItem = ({ entry }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -93,12 +94,12 @@ const DreamEntryItem = ({ entry }) => {
         
         const result = await createShareableLink(entry.user, entry.timestamp);
         
-        if (result.length === 0) {
+        if (result === "") {
           setShareError('Could not create share link. Please try again.');
           return;
         }
         
-        const shareId = result[0];
+        const shareId = result;
         const shareUrl = `${window.location.origin}/shared/${shareId}`;
         setShareLink(shareUrl);
         setIsCurrentlyShared(true);
@@ -182,11 +183,41 @@ const DreamEntryItem = ({ entry }) => {
     selectDreamForEditing(entry);
     setIsAnalyzed(true);
     setActiveTab('write');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
+    scrollToTop({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t))
+    });
   };
 
   const handleMintedDeleteAttempt = () => {
     setMintError('This dream cannot be deleted because it has been minted as an NFT. Burn the NFT first to delete.');
+  };
+
+  const handleCopyShareLink = async (e) => {
+    e.stopPropagation();
+    setIsSharing(true);
+    
+    try {
+      const result = await createShareableLink(entry.user, entry.timestamp);
+      if (result) {
+        const shareUrl = `${window.location.origin}/shared/${result}`;
+        setShareLink(shareUrl);
+        
+        try {
+          await navigator.clipboard.writeText(shareUrl);
+          setClipboardStatus('Copied to clipboard!');
+          setTimeout(() => setClipboardStatus(''), 2000);
+        } catch (clipboardError) {
+          setClipboardStatus('Click to copy');
+        }
+      }
+    } catch (error) {
+      console.error('Error getting share link:', error);
+      setShareError('Failed to get share link');
+    } finally {
+      setIsSharing(false);
+    }
   };
 
   const toggleOpen = (e) => {
@@ -208,9 +239,10 @@ const DreamEntryItem = ({ entry }) => {
         if (entryRef.current) {
           const rect = entryRef.current.getBoundingClientRect();
           if (rect.top < 80 || rect.bottom > window.innerHeight) {
-            entryRef.current.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'start'
+            scrollTo(entryRef.current, {
+              offset: -80,
+              duration: 1.0,
+              easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             });
           }
         }
@@ -473,19 +505,42 @@ const DreamEntryItem = ({ entry }) => {
               
               <div className="action-buttons">
                 <div className="primary-actions">
-                  <button
-                    onClick={handleShare}
-                    className={`dream-button ${isCurrentlyShared ? 'unshare-button' : 'share-button'}`}
-                    aria-label={isCurrentlyShared ? "Stop sharing this dream" : "Share this dream"}
-                    disabled={isSharing || isUnsharing}
-                  >
-                    <i className={`fas ${isCurrentlyShared ? 'fa-unlink' : 'fa-share-alt'}`}></i>
-                    <span>
-                      {isSharing ? 'Sharing...' : 
-                       isUnsharing ? 'Unsharing...' : 
-                       isCurrentlyShared ? 'Unshare' : 'Share'}
-                    </span>
-                  </button>
+                  {isCurrentlyShared ? (
+                    <div className="share-actions">
+                      <button
+                        onClick={handleShare}
+                        className="dream-button unshare-button"
+                        aria-label="Stop sharing this dream"
+                        disabled={isSharing || isUnsharing}
+                      >
+                        <i className="fas fa-unlink"></i>
+                        <span>
+                          {isUnsharing ? 'Unsharing...' : 'Unshare'}
+                        </span>
+                      </button>
+                      <button
+                        onClick={handleCopyShareLink}
+                        className="dream-button copy-link-button"
+                        aria-label="Copy share link"
+                        disabled={isSharing || isUnsharing}
+                      >
+                        <i className="fas fa-link"></i>
+                        <span>Copy Link</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleShare}
+                      className="dream-button share-button"
+                      aria-label="Share this dream"
+                      disabled={isSharing}
+                    >
+                      <i className="fas fa-share-alt"></i>
+                      <span>
+                        {isSharing ? 'Sharing...' : 'Share'}
+                      </span>
+                    </button>
+                  )}
 
                   {hasVisualizations && (
                     <button

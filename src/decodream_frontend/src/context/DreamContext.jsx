@@ -9,7 +9,11 @@ const DreamContext = createContext({
 
 export const DreamProvider = ({ children }) => {
   const { isLoggedIn, getPrincipal } = useAuth();
-  const [activeTab, setActiveTab] = useState('write');
+  const [activeTab, setActiveTab] = useState(() => {
+    const savedTab = typeof localStorage !== 'undefined' ? 
+      localStorage.getItem('decodream-active-tab') : null;
+    return savedTab || 'write';
+  });
   const [dreamEntries, setDreamEntries] = useState([]);
   const [currentDream, setCurrentDream] = useState("");
   const [currentAnalysis, setCurrentAnalysis] = useState("");
@@ -24,6 +28,10 @@ export const DreamProvider = ({ children }) => {
   const [currentImage, setCurrentImage] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [isAnalyzed, setIsAnalyzed] = useState(false);
+
+  useEffect(() => {
+    localStorage.setItem('decodream-active-tab', activeTab);
+  }, [activeTab]);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -162,7 +170,7 @@ export const DreamProvider = ({ children }) => {
     } catch (err) {
       console.error("Error create shareable link:", err);
       setError("Failed to create shareable link");
-      return [];
+      return "";
     }
   };
 

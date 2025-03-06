@@ -3,13 +3,14 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useDreams } from "../../context/DreamContext";
 import "../styles/LandingPage.scss";
+import { scrollToTop } from "../common/Scrolls";
 
 const LandingPage = () => {
   const { isLoggedIn, login, isAuthenticating } = useAuth();
   const { resetCurrentDream } = useDreams();
 
   const handleLogin = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    scrollToTop();
     resetCurrentDream();
     login();
   };
